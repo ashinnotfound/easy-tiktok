@@ -2,32 +2,35 @@ package rpc
 
 import (
 	"easy-tiktok/apps/app/internal/config"
-	"easy-tiktok/apps/user/user"
-	"golang.org/x/net/context"
+	user "easy-tiktok/apps/user/proto"
+	video "easy-tiktok/apps/video/proto"
 	"google.golang.org/grpc"
-	"time"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 var userRpc user.UserClient
+var videoRpc video.VideoClient
 
-func init() {
-	dial, err := grpc.Dial(config.C.RPC.Host, grpc.WithBlock())
+func Initial() {
+	dial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
-		return
+		panic(err)
 	}
-	// 延迟关闭连接
-	defer dial.Close()
+
+	dial1, errr := grpc.Dial(config.C.VideoHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+
+	if errr != nil {
+		panic(errr)
+	}
 	// 初始化Rpc服务客户端
 	userRpc = user.NewUserClient(dial)
-	//  videoRpc = video.NewVideoClient(dial)
-}
-
-func GetCtx() context.Context {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
-	defer cancel()
-	return ctx
+	videoRpc = video.NewVideoClient(dial1)
 }
 
 func GetUserRpc() user.UserClient {
 	return userRpc
+}
+
+func GetVideoRpc() video.VideoClient {
+	return videoRpc
 }

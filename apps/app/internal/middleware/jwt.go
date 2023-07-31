@@ -1,75 +1,47 @@
 package middleware
 
 import (
-	"github.com/dgrijalva/jwt-go"
+	"easy-tiktok/util"
 	"github.com/gin-gonic/gin"
-	"time"
 )
-
-type DouYinClaims struct {
-	UserId int64  `json:"userId"`
-	Secret string `json:"secret"`
-	jwt.StandardClaims
-}
-
-var Key = "JustAsNoStarsCanBeSeen"
 
 func Jwt() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		value := context.Param("token")
-		if value == "" {
-			context.JSON(200, gin.H{
-				"code": 500,
-				"msg":  "token is empty",
-			})
-			context.Abort()
-			return
-		}
-		claims, err := ParseToken(value)
-		if err != nil || claims.Secret != Key {
-			context.JSON(200, gin.H{
-				"code": 500,
-				"msg":  "token is invalid",
-			})
-			context.Abort()
-			return
+		if context.Request.URL.Path != "/douyin/user/login" || context.Request.URL.Path != "/douyin/user/register" {
+			value := context.Query("token")
+			println("1" + value)
+			if value == "" {
+				context.JSON(401, gin.H{
+					"msg": "token is empty",
+				})
+				context.Abort()
+				return
+			}
+			claims, err := util.ParseToken(value)
+			if err != nil || claims.Secret != util.Key {
+				context.JSON(401, gin.H{
+					"msg": "token is invalid",
+				})
+				context.Abort()
+				return
+			}
 		}
 		context.Next()
 	}
 }
 
-func GetToken(userId int64, times int64) (string, error) {
-	claims := jwt.NewWithClaims(jwt.SigningMethodHS256, DouYinClaims{
-		UserId: userId,
-		Secret: Key,
-		StandardClaims: jwt.StandardClaims{
-			Audience:  "",
-			ExpiresAt: time.Now().Unix() + times,
-			Id:        "",
-			IssuedAt:  time.Now().Unix(),
-			Issuer:    "admin",
-			NotBefore: 0,
-			Subject:   "",
-		},
-	})
-	signedString, err := claims.SignedString([]byte("golang"))
-	if err != nil {
-		return "", err
-	}
-	return signedString, nil
-}
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
 
-func ParseToken(token string) (*DouYinClaims, error) {
-	tokenClaims, err := jwt.ParseWithClaims(token, &DouYinClaims{}, func(token *jwt.Token) (interface{}, error) {
-		return []byte("golang"), nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if tokenClaims != nil {
-		if claims, ok := tokenClaims.Claims.(*DouYinClaims); ok && tokenClaims.Valid {
-			return claims, nil
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
 		}
+
+		c.Next()
 	}
-	return nil, err
 }

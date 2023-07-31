@@ -3,21 +3,24 @@ package config
 import (
 	"gopkg.in/yaml.v3"
 	"os"
+	"path/filepath"
 )
 
 var C config
 
 type config struct {
-	Host string `yaml:"Host"`
-	RPC  struct {
-		Host string `yaml:"Host"`
-	}
+	Host      string `yaml:"Host"`
+	UserHost  string `yaml:"UserHost"`
+	VideoHost string `yaml:"VideoHost"`
 }
 
-func init() {
-	file, err := os.ReadFile("..../etc/config.yaml")
+func Initial() {
+	dir, _ := os.Getwd()
+	yamlPath := filepath.Join(dir, "/etc/cfg.yaml")
+	println(yamlPath)
+	file, err := os.ReadFile(yamlPath)
 	if err != nil {
-		return
+		panic(err)
 	}
 	err = yaml.Unmarshal(file, &C)
 	if err != nil {
