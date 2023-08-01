@@ -111,7 +111,7 @@ func (l Server) GetUserInfo(ctx context.Context, request *proto.DouyinUserReques
 		// 继续执行
 	}
 	id := request.GetUserId()
-	viewerId := util.GetTokenTid(request.GetToken())
+	viewerId := util.GetUserId(request.GetToken())
 	db := Mysql.GetDB()
 	user := Mysql.UserMsg{}
 	follow := Mysql.Follow{}
