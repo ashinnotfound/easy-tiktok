@@ -114,11 +114,11 @@ service relation{
   // 关系操作
   rpc action(douyin_relation_action_request) returns(douyin_relation_action_response);
   // 用户关注列表
-  rpc follow_list(douyin_relation_follow_list_request) returns(douyin_relation_follow_list_response);
+  rpc get_follow_list(douyin_relation_follow_list_request) returns(douyin_relation_follow_list_response);
   // 用户粉丝列表
-  rpc follower_list(douyin_relation_follower_list_request) returns(douyin_relation_follower_list_response);
+  rpc get_follower_list(douyin_relation_follower_list_request) returns(douyin_relation_follower_list_response);
   // 用户好友列表
-  rpc friend_list(douyin_relation_friend_list_request) returns(douyin_relation_friend_list_response);
+  rpc get_friend_list(douyin_relation_friend_list_request) returns(douyin_relation_friend_list_response);
 }
 
 service message{
