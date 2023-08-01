@@ -7,9 +7,15 @@ import (
 
 func Route(e *gin.Engine) {
 	e.Use(middleware.CORSMiddleware())
-	e.POST("/douyin/user/login/", loginHandler)
-	e.POST("/douyin/user/register/", registerHandler)
-	e.GET("/douyin/feed", videoFeedHandler)
 	e.Use(middleware.Jwt())
-	e.GET("/douyin/user/", userInfoHandler)
+	group := e.Group("/douyin")
+	{
+		routerGroup := group.Group("/user")
+		{
+			routerGroup.POST("/login/", loginHandler)
+			routerGroup.POST("/register/", registerHandler)
+			routerGroup.GET("/", userInfoHandler)
+		}
+		group.GET("/feed", videoFeedHandler)
+	}
 }

@@ -7,9 +7,9 @@ import (
 
 func Jwt() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if context.Request.URL.Path != "/douyin/user/login" || context.Request.URL.Path != "/douyin/user/register" {
+		if context.Request.URL.Path != "/douyin/user/login/" && context.Request.URL.Path != "/douyin/user/register/" && context.Request.URL.Path != "/douyin/feed" {
+			println(context.Request.URL.Path)
 			value := context.Query("token")
-			println("1" + value)
 			if value == "" {
 				context.JSON(401, gin.H{
 					"msg": "token is empty",
@@ -36,12 +36,10 @@ func CORSMiddleware() gin.HandlerFunc {
 		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
 		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
 		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT")
-
 		if c.Request.Method == "OPTIONS" {
 			c.AbortWithStatus(204)
 			return
 		}
-
 		c.Next()
 	}
 }
