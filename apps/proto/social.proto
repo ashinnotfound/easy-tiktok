@@ -1,0 +1,129 @@
+syntax = "proto2";
+package social;
+option go_package="../social/proto;proto";
+
+message User {
+  required int64 id = 1; // 用户id
+  required string name = 2; // 用户名称
+  optional int64 follow_count = 3; // 关注总数
+  optional int64 follower_count = 4; // 粉丝总数
+  required bool is_follow = 5; // true-已关注，false-未关注
+  optional string avatar = 6; //用户头像
+  optional string background_image = 7; //用户个人页顶部大图
+  optional string signature = 8; //个人简介
+  optional int64 total_favorited = 9; //获赞数量
+  optional int64 work_count = 10; //作品数量
+  optional int64 favorite_count = 11; //点赞数量
+}
+
+// 关系操作
+// 登录用户对其他用户进行关注或取消关注
+message douyin_relation_action_request {
+  required string token = 1; // 用户鉴权token
+  required int64 to_user_id = 2; // 对方用户id
+  required int32 action_type = 3; // 1-关注，2-取消关注
+}
+
+message douyin_relation_action_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+}
+
+// 用户关注列表
+// 登录用户关注的所有用户列表
+message douyin_relation_follow_list_request {
+  required int64 user_id = 1; // 用户id
+  required string token = 2; // 用户鉴权token
+}
+
+message douyin_relation_follow_list_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户信息列表
+}
+
+// 用户粉丝列表
+// 所有关注登录用户的粉丝列表
+message douyin_relation_follower_list_request {
+  required int64 user_id = 1; // 用户id
+  required string token = 2; // 用户鉴权token
+}
+
+message douyin_relation_follower_list_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated User user_list = 3; // 用户列表
+}
+
+// 用户好友列表
+// 所有关注登录用户的粉丝列表
+message FriendUser{
+  optional User user = 1;
+  optional string message = 2; // 和该好友的最新聊天消息
+  required int64 msgType = 3; // message消息的类型，0 => 当前请求用户接收的消息， 1 => 当前请求用户发送的消息
+}
+
+message douyin_relation_friend_list_request {
+  required int64 user_id = 1; // 用户id
+  required string token = 2; // 用户鉴权token
+}
+
+message douyin_relation_friend_list_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated FriendUser user_list = 3; // 用户列表
+}
+
+// 聊天记录
+// 当前登录用户和其他指定用户的聊天消息记录
+message Message {
+  required int64 id = 1; // 消息id
+  required int64 to_user_id = 2; // 该消息接收者的id
+  required int64 from_user_id =3; // 该消息发送者的id
+  required string content = 4; // 消息内容
+  optional string create_time = 5; // 消息创建时间
+}
+
+message douyin_message_chat_request {
+  required string token = 1; // 用户鉴权token
+  required int64 to_user_id = 2; // 对方用户id
+  required int64 pre_msg_time=3;//上次最新消息的时间（新增字段-apk更新中）
+}
+
+message douyin_message_chat_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated Message message_list = 3; // 消息列表
+}
+
+// 消息操作
+// 登录用户对消息的相关操作，目前只支持消息发送
+message douyin_message_action_request {
+  required string token = 1; // 用户鉴权token
+  required int64 to_user_id = 2; // 对方用户id
+  required int32 action_type = 3; // 1-发送消息
+  required string content = 4; // 消息内容
+}
+
+message douyin_message_action_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+}
+
+service relation{
+  // 关系操作
+  rpc action(douyin_relation_action_request) returns(douyin_relation_action_response);
+  // 用户关注列表
+  rpc follow_list(douyin_relation_follow_list_request) returns(douyin_relation_follow_list_response);
+  // 用户粉丝列表
+  rpc follower_list(douyin_relation_follower_list_request) returns(douyin_relation_follower_list_response);
+  // 用户好友列表
+  rpc friend_list(douyin_relation_friend_list_request) returns(douyin_relation_friend_list_response);
+}
+
+service message{
+  // 聊天记录
+  rpc chat(douyin_message_chat_request) returns (douyin_message_chat_response);
+  // 消息操作
+  rpc action(douyin_message_action_request) returns(douyin_message_action_response);
+}
