@@ -22,7 +22,7 @@ func videoFeedHandler(context *gin.Context) {
 	feed, err := videoRpc.Feed(context2.Background(), &req)
 	if err != nil {
 		panic(err)
-		context.JSON(400, err)
+		context.JSON(200, err)
 		return
 	}
 	context.JSON(http.StatusOK, &feed)

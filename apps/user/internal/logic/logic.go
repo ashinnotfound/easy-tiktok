@@ -14,6 +14,8 @@ type Server struct {
 	proto.UserServer
 }
 
+var wrong int64 = 1
+
 func (l Server) Login(ctx context.Context, request *proto.DouyinUserLoginRequest) (*proto.DouyinUserLoginResponse, error) {
 	select {
 	//判断请求是否被取消
@@ -26,7 +28,13 @@ func (l Server) Login(ctx context.Context, request *proto.DouyinUserLoginRequest
 	user := Mysql.UserEntry{}
 	tx := model.Where("username = ? and password = ?", request.GetUsername(), request.GetPassword()).First(&user)
 	if tx.Error != nil {
-		return nil, tx.Error
+		str := "用户名或密码错误"
+		return &proto.DouyinUserLoginResponse{
+			StatusCode: &Mysql.S.Bad,
+			StatusMsg:  &str,
+			UserId:     &wrong,
+			Token:      &str,
+		}, nil
 	}
 	token, err := util.GetToken(user.ID)
 	if err != nil {
@@ -52,9 +60,12 @@ func (l Server) Register(ctx context.Context, request *proto.DouyinUserRegisterR
 	var entry Mysql.UserEntry
 	tx := model.Where("username = ?", request.GetUsername()).First(&entry)
 	if tx.Error == nil || tx.RowsAffected != 0 {
+		str := "用户名重复"
 		return &proto.DouyinUserRegisterResponse{
 			StatusCode: &Mysql.S.Bad,
-			StatusMsg:  &Mysql.S.BadMsg,
+			StatusMsg:  &str,
+			UserId:     &wrong,
+			Token:      &str,
 		}, nil
 	}
 	entry = Mysql.UserEntry{

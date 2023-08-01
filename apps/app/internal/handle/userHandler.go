@@ -18,8 +18,7 @@ func loginHandler(c *gin.Context) {
 	userRpc := rpc.GetUserRpc()
 	login, err := userRpc.Login(context2.Background(), &req)
 	if err != nil {
-		panic(err)
-		c.JSON(400, err)
+		c.JSON(400, login)
 		return
 	}
 	c.JSON(200, login)
@@ -55,7 +54,7 @@ func registerHandler(context *gin.Context) {
 	userRpc := rpc.GetUserRpc()
 	register, err := userRpc.Register(context2.Background(), &req)
 	if err != nil {
-		context.JSON(400, err)
+		context.JSON(400, register)
 		return
 	}
 	context.JSON(200, register)
