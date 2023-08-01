@@ -1,6 +1,6 @@
 // 互动接口定义
 syntax = "proto2";
-package douyin.extra.first;
+package interaction;
 option go_package = "/proto";
 
 message douyin_favorite_action_request {
