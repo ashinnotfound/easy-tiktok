@@ -50,7 +50,7 @@ func ParseToken(token string) (*DouYinClaims, error) {
 	}
 	return nil, err
 }
-func GetTokenTid(token string) int64 {
+func GetUserId(token string) int64 {
 	claims, _ := ParseToken(token)
 	return claims.UserId
 }
