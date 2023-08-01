@@ -30,15 +30,15 @@ func (s Server) Feed(ctx context.Context, request *proto.DouyinFeedRequest) (*pr
 	m := map[int64]bool{}
 	likes := map[int64]bool{}
 	if *request.Token != "" {
-		tid := util.GetTokenTid(*request.Token)
+		userId := util.GetUserId(*request.Token)
 		var follow []Mysql.Follow
-		if db.Where("follower =?", tid).Find(&follow).Error == nil {
+		if db.Where("follower =?", userId).Find(&follow).Error == nil {
 			for _, v := range follow {
 				m[v.BeFollowed.Int64] = true
 			}
 		}
 		var like []Mysql.Like
-		if db.Where("liker_id =?", tid).Find(&like).Error == nil {
+		if db.Where("liker_id =?", userId).Find(&like).Error == nil {
 			for _, v := range like {
 				likes[v.VideoID] = true
 			}
