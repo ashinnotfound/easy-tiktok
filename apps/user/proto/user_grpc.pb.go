@@ -4,7 +4,7 @@
 // - protoc             v3.19.4
 // source: user.proto
 
-package user
+package proto
 
 import (
 	context "context"
@@ -24,6 +24,7 @@ const _ = grpc.SupportPackageIsVersion7
 type UserClient interface {
 	Login(ctx context.Context, in *DouyinUserLoginRequest, opts ...grpc.CallOption) (*DouyinUserLoginResponse, error)
 	Register(ctx context.Context, in *DouyinUserRegisterRequest, opts ...grpc.CallOption) (*DouyinUserRegisterResponse, error)
+	GetUserInfo(ctx context.Context, in *DouyinUserRequest, opts ...grpc.CallOption) (*DouyinUserResponse, error)
 }
 
 type userClient struct {
@@ -52,12 +53,22 @@ func (c *userClient) Register(ctx context.Context, in *DouyinUserRegisterRequest
 	return out, nil
 }
 
+func (c *userClient) GetUserInfo(ctx context.Context, in *DouyinUserRequest, opts ...grpc.CallOption) (*DouyinUserResponse, error) {
+	out := new(DouyinUserResponse)
+	err := c.cc.Invoke(ctx, "/user.user/GetUserInfo", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserServer is the server API for User service.
 // All implementations must embed UnimplementedUserServer
 // for forward compatibility
 type UserServer interface {
 	Login(context.Context, *DouyinUserLoginRequest) (*DouyinUserLoginResponse, error)
 	Register(context.Context, *DouyinUserRegisterRequest) (*DouyinUserRegisterResponse, error)
+	GetUserInfo(context.Context, *DouyinUserRequest) (*DouyinUserResponse, error)
 	mustEmbedUnimplementedUserServer()
 }
 
@@ -70,6 +81,9 @@ func (UnimplementedUserServer) Login(context.Context, *DouyinUserLoginRequest) (
 }
 func (UnimplementedUserServer) Register(context.Context, *DouyinUserRegisterRequest) (*DouyinUserRegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
+}
+func (UnimplementedUserServer) GetUserInfo(context.Context, *DouyinUserRequest) (*DouyinUserResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserInfo not implemented")
 }
 func (UnimplementedUserServer) mustEmbedUnimplementedUserServer() {}
 
@@ -120,6 +134,24 @@ func _User_Register_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _User_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DouyinUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserServer).GetUserInfo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.user/GetUserInfo",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserServer).GetUserInfo(ctx, req.(*DouyinUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // User_ServiceDesc is the grpc.ServiceDesc for User service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -134,6 +166,10 @@ var User_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "register",
 			Handler:    _User_Register_Handler,
+		},
+		{
+			MethodName: "GetUserInfo",
+			Handler:    _User_GetUserInfo_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
