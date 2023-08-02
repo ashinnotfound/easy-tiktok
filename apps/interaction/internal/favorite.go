@@ -45,7 +45,7 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 
 	// 查找视频点赞记录 判断点赞/取消点赞
 	var like Mysql.Like
-	if err := tx.Where("video_id = ? AND liker_id = ?", request.GetVideoId(), userId).Find(&like).Error; err != nil {
+	if err := tx.Where("video_id = ? AND liker_id = ?", request.GetVideoId(), userId).First(&like).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 进行点赞操作
 			if request.GetActionType() != 1 {
