@@ -111,14 +111,15 @@ func (Server) GetFavoriteList(ctx context.Context, request *proto.DouyinFavorite
 		// 继续执行
 	}
 
-	// 验证token
-	if request.GetToken() == "" {
-		return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
-	}
-	userId := util.GetUserId(request.GetToken())
-	if userId != request.GetUserId() {
-		return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
-	}
+	//// 验证token
+	//if request.GetToken() == "" {
+	//	return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
+	//}
+	//userId := util.GetUserId(request.GetToken())
+	//if userId != request.GetUserId() {
+	//	return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
+	//}
+	userId := request.GetUserId()
 
 	db := Mysql.GetDB()
 	// 查找当前用户的点赞视频
