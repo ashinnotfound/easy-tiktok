@@ -67,5 +67,18 @@ func commentHandler(context *gin.Context) {
 }
 
 func getCommentListHandler(context *gin.Context) {
+	token := context.Query("token")
+	videoId, _ := strconv.ParseInt(context.Query("video_id"), 10, 64)
 
+	req := interaction.DouyinCommentListRequest{
+		Token:   &token,
+		VideoId: &videoId,
+	}
+
+	commentList, err := rpc.GetInteractionRpc().GetCommentList(context, &req)
+	if err != nil {
+		context.JSON(400, commentList)
+		return
+	}
+	context.JSON(200, commentList)
 }
