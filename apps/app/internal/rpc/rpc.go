@@ -3,6 +3,7 @@ package rpc
 import (
 	"easy-tiktok/apps/app/config"
 	interaction "easy-tiktok/apps/interaction/proto"
+	social "easy-tiktok/apps/social/proto"
 	user "easy-tiktok/apps/user/proto"
 	video "easy-tiktok/apps/video/proto"
 	"google.golang.org/grpc"
@@ -12,6 +13,7 @@ import (
 var userRpc user.UserClient
 var videoRpc video.VideoClient
 var interactionRpc interaction.InteractionClient
+var socialRpc *social.SocialClient
 
 func Initial() {
 	dial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -44,4 +46,10 @@ func GetVideoRpc() video.VideoClient {
 
 func GetInteractionRpc() interaction.InteractionClient {
 	return interactionRpc
+}
+
+// GetSocialRpc //
+// 获取社交模块的rpc客户端
+func GetSocialRpc() *social.SocialClient {
+	return socialRpc
 }
