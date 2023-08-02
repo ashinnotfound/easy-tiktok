@@ -28,7 +28,9 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 	// 查询中间表
 	var po model.UserFollow
 	// 初始化响应
-	var response *pb.DouyinRelationActionResponse
+	response := &pb.DouyinRelationActionResponse{}
+	response.StatusCode = new(int32)
+	response.StatusMsg = new(string)
 	*response.StatusCode = constant.STATUS_OK
 
 	// 逻辑判断
