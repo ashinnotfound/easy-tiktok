@@ -9,4 +9,8 @@ type UserFollow struct {
 	Status   int32 `gorm:"column:status;NOT NULL;comment:'关注状态'"`
 }
 
+func (UserFollow) TableName() string {
+	return USER_FOLLOW_TABLE
+}
+
 const USER_FOLLOW_TABLE = "user_follow"
