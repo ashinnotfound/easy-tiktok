@@ -32,7 +32,7 @@ func (impl *RelationServiceImpl) Action(ctx context.Context, request *pb.DouyinR
 	*response.StatusCode = constant.STATUS_OK
 
 	// 逻辑判断
-	if result := userFollowTable.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).First(&po); result.Error != nil {
+	if result := userFollowTable.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).Limit(1).Find(&po); result.Error != nil {
 		// 查询数据库出现问题
 		*response.StatusCode = constant.STATUS_FAILED
 		*response.StatusMsg = "数据库层面出现问题,Action接口调用失败"
