@@ -50,8 +50,6 @@ message User {
   optional int64 favorite_count = 11; //点赞数量
 }
 
-//  POST /douyin/comment/action/ - 评论操作
-//  登录用户对视频进行评论。
 message douyin_comment_action_request {
   required string token = 1; // 用户鉴权token
   required int64 video_id = 2; // 视频id
