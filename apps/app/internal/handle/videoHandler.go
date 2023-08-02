@@ -5,6 +5,7 @@ import (
 	"easy-tiktok/apps/app/internal/rpc"
 	video "easy-tiktok/apps/video/proto"
 	"github.com/gin-gonic/gin"
+	"net/http"
 	"strconv"
 )
 
@@ -23,4 +24,33 @@ func videoFeedHandler(context *gin.Context) {
 		return
 	}
 	context.JSON(200, &feed)
+}
+
+func videoActionHandler(context *gin.Context) {
+
+	videoFile := context.Query("data")
+
+	videoFileBytes := []byte(videoFile)
+
+	token := context.Query("token")
+	title := context.Query("title")
+
+	req := video.DouyinPublishActionRequest{
+		Token: &token,
+		Data:  videoFileBytes,
+		Title: &title,
+	}
+
+	videoRpc := rpc.GetVideoRpc()
+	action, err := videoRpc.Action(context2.Background(), &req)
+	if err != nil {
+		panic(err)
+		context.JSON(200, err)
+		return
+	}
+	context.JSON(http.StatusOK, &action)
+}
+
+func videoListHandler(context *gin.Context) {
+
 }
