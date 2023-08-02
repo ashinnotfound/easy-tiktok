@@ -1,0 +1,94 @@
+// 互动接口定义
+syntax = "proto2";
+package interaction;
+option go_package = "/proto";
+
+message douyin_favorite_action_request {
+  required string token = 1; // 用户鉴权token
+  required int64 video_id = 2; // 视频id
+  required int32 action_type = 3; // 1-点赞，2-取消点赞
+}
+
+message douyin_favorite_action_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+}
+
+message douyin_favorite_list_request {
+  required int64 user_id = 1; // 用户id
+  required string token = 2; // 用户鉴权token
+}
+
+message douyin_favorite_list_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated Video video_list = 3; // 用户点赞视频列表
+}
+
+message Video {
+  required int64 id = 1; // 视频唯一标识
+  required User author = 2; // 视频作者信息
+  required string play_url = 3; // 视频播放地址
+  required string cover_url = 4; // 视频封面地址
+  required int64 favorite_count = 5; // 视频的点赞总数
+  required int64 comment_count = 6; // 视频的评论总数
+  required bool is_favorite = 7; // true-已点赞，false-未点赞
+  required string title = 8; // 视频标题
+}
+
+message User {
+  required int64 id = 1; // 用户id
+  required string name = 2; // 用户名称
+  optional int64 follow_count = 3; // 关注总数
+  optional int64 follower_count = 4; // 粉丝总数
+  required bool is_follow = 5; // true-已关注，false-未关注
+  optional string avatar = 6; //用户头像
+  optional string background_image = 7; //用户个人页顶部大图
+  optional string signature = 8; //个人简介
+  optional int64 total_favorited = 9; //获赞数量
+  optional int64 work_count = 10; //作品数量
+  optional int64 favorite_count = 11; //点赞数量
+}
+
+message douyin_comment_action_request {
+  required string token = 1; // 用户鉴权token
+  required int64 video_id = 2; // 视频id
+  required int32 action_type = 3; // 1-发布评论，2-删除评论
+  optional string comment_text = 4; // 用户填写的评论内容，在action_type=1的时候使用
+  optional int64 comment_id = 5; // 要删除的评论id，在action_type=2的时候使用
+}
+
+message douyin_comment_action_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  optional Comment comment = 3; // 评论成功返回评论内容，不需要重新拉取整个列表
+}
+
+message Comment {
+  required int64 id = 1; // 视频评论id
+  required User user =2; // 评论用户信息
+  required string content = 3; // 评论内容
+  required string create_date = 4; // 评论发布日期，格式 mm-dd
+}
+
+message douyin_comment_list_request {
+  required string token = 1; // 用户鉴权token
+  required int64 video_id = 2; // 视频id
+}
+
+message douyin_comment_list_response {
+  required int32 status_code = 1; // 状态码，0-成功，其他值-失败
+  optional string status_msg = 2; // 返回状态描述
+  repeated Comment comment_list = 3; // 评论列表
+}
+
+service interaction {
+  //  POST /douyin/favorite/action/ - 赞操作  登录用户对视频的点赞和取消点赞操作。
+  rpc favorite(douyin_favorite_action_request) returns (douyin_favorite_action_response);
+  //  GET /douyin/favorite/list/ - 喜欢列表  登录用户的所有点赞视频。
+  rpc getFavoriteList(douyin_favorite_list_request) returns (douyin_favorite_list_response);
+  //  POST /douyin/comment/action/ - 评论操作  登录用户对视频进行评论。
+  rpc comment(douyin_comment_action_request) returns (douyin_comment_action_response);
+  //  GET /douyin/comment/list/ - 视频评论列表  查看视频的所有评论，按发布时间倒序。
+  rpc getCommentList(douyin_comment_list_request) returns (douyin_comment_list_response);
+}

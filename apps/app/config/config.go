@@ -9,14 +9,16 @@ import (
 var C config
 
 type config struct {
-	Host      string `yaml:"Host"`
-	UserHost  string `yaml:"UserHost"`
-	VideoHost string `yaml:"VideoHost"`
+	NetworkType     string `yaml:"NetworkType"`
+	Host            string `yaml:"Host"`
+	UserHost        string `yaml:"UserHost"`
+	VideoHost       string `yaml:"VideoHost"`
+	InteractionHost string `yaml:"InteractionHost"`
 }
 
 func Initial() {
 	dir, _ := os.Getwd()
-	yamlPath := filepath.Join(dir, "/etc/cfg.yaml")
+	yamlPath := filepath.Join(dir, "apps/app/etc/cfg.yaml")
 	println(yamlPath)
 	file, err := os.ReadFile(yamlPath)
 	if err != nil {
