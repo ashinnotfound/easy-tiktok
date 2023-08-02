@@ -28,6 +28,7 @@ func Route(e *gin.Engine) {
 			commentGroup.POST("/action/", commentHandler)
 			commentGroup.GET("/list/", getCommentListHandler)
 		}
+
 	}
 
 	socialRouter := router.SocialRouter{RootGroup: group}
