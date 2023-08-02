@@ -15,7 +15,9 @@ func init() {
 	// 设置输出
 	logger.Out = os.Stdout
 	// 设置格式
-	logger.Formatter = &logrus.JSONFormatter{}
+	logger.Formatter = &logrus.JSONFormatter{
+		TimestampFormat: "2006-01-02 15:04:05",
+	}
 	// 设置输出级别
 	logger.SetLevel(logrus.InfoLevel)
 	global.LOGGER = logger
