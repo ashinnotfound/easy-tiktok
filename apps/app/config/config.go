@@ -9,9 +9,11 @@ import (
 var C config
 
 type config struct {
-	Host      string `yaml:"Host"`
-	UserHost  string `yaml:"UserHost"`
-	VideoHost string `yaml:"VideoHost"`
+	NetworkType     string `yaml:"NetworkType"`
+	Host            string `yaml:"Host"`
+	UserHost        string `yaml:"UserHost"`
+	VideoHost       string `yaml:"VideoHost"`
+	InteractionHost string `yaml:"InteractionHost"`
 }
 
 func Initial() {

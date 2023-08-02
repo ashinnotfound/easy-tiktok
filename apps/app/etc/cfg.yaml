@@ -1,3 +1,5 @@
+NetWorkType: "tcp"
 Host: 0.0.0.0:8888
 UserHost: localhost:8091
 VideoHost: localhost:8089
+InteractionHost: localhost:8090
