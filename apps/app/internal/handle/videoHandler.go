@@ -13,7 +13,6 @@ func videoFeedHandler(context *gin.Context) {
 	token := context.Query("token")
 	time := context.Query("latest_time")
 	parseInt, err := strconv.ParseInt(time, 10, 64)
-
 	req := video.DouyinFeedRequest{
 		LatestTime: &parseInt,
 		Token:      &token,
@@ -21,9 +20,37 @@ func videoFeedHandler(context *gin.Context) {
 	videoRpc := rpc.GetVideoRpc()
 	feed, err := videoRpc.Feed(context2.Background(), &req)
 	if err != nil {
+		context.JSON(400, err)
+		return
+	}
+	context.JSON(200, &feed)
+}
+
+func videoActionHandler(context *gin.Context) {
+
+	videoFile := context.Query("data")
+
+	videoFileBytes := []byte(videoFile)
+
+	token := context.Query("token")
+	title := context.Query("title")
+
+	req := video.DouyinPublishActionRequest{
+		Token: &token,
+		Data:  videoFileBytes,
+		Title: &title,
+	}
+
+	videoRpc := rpc.GetVideoRpc()
+	action, err := videoRpc.Action(context2.Background(), &req)
+	if err != nil {
 		panic(err)
 		context.JSON(200, err)
 		return
 	}
-	context.JSON(http.StatusOK, &feed)
+	context.JSON(http.StatusOK, &action)
+}
+
+func videoListHandler(context *gin.Context) {
+
 }
