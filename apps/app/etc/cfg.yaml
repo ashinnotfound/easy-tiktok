@@ -1,4 +1,4 @@
-NetWorkType: "tcp"
+NetworkType: "tcp"
 Host: 0.0.0.0:8888
 UserHost: localhost:8091
 VideoHost: localhost:8089
