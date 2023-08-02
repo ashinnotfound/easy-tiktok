@@ -26,10 +26,10 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	}
 
 	// 验证token
-	if *request.Token == "" {
-		return nil, status.Error(codes.InvalidArgument, "Favorite::invalid token")
+	if request.GetToken() == "" {
+		return nil, status.Error(codes.Unauthenticated, "Favorite::invalid token")
 	}
-	userId := util.GetUserId(*request.Token)
+	userId := util.GetUserId(request.GetToken())
 
 	// 开始事务
 	tx := Mysql.GetDB().Begin()
@@ -38,42 +38,55 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	tx.First(&userMsg, userId)
 	// 查找视频
 	var video Mysql.Video
-	tx.First(&video, *request.VideoId)
+	tx.First(&video, request.GetVideoId())
 	// 查找视频发布者
 	var videoMakerMsg Mysql.UserMsg
 	tx.First(&videoMakerMsg, video.UserMsgID)
-	//待操作数
-	numToAdd := 1
+
 	// 查找视频点赞记录 判断点赞/取消点赞
 	var like Mysql.Like
-	if result := tx.Where("video_id = ? AND liker_id = ?", *request.VideoId, userId).Find(&like).Error; result != nil {
-		if errors.Is(result, gorm.ErrRecordNotFound) {
+	if err := tx.Where("video_id = ? AND liker_id = ?", request.GetVideoId(), userId).Find(&like).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 进行点赞操作
+			if request.GetActionType() != 1 {
+				return nil, status.Error(codes.Aborted, "Favorite::invalid actionType")
+			}
 			// 创建点赞记录
-			if tx.Create(&Mysql.Like{VideoID: *request.VideoId, LikerID: userId}).Error != nil {
+			if tx.Create(&Mysql.Like{VideoID: request.GetVideoId(), LikerID: userId}).Error != nil {
 				// 业务失败
 				tx.Rollback()
-				return nil, status.Error(codes.Unimplemented, "Favorite::operation failed")
+				return nil, status.Error(codes.Aborted, "Favorite::database exception")
 			}
 		} else {
 			return nil, status.Error(codes.Aborted, "Favorite::database exception")
 		}
 	} else {
 		// 进行取消点赞操作
-		numToAdd = -1
+		if request.GetActionType() != 2 {
+			return nil, status.Error(codes.Aborted, "Favorite::invalid actionType")
+		}
 		// 删除点赞记录
 		if tx.Delete(&like).Error != nil {
 			// 业务失败
 			tx.Rollback()
-			return nil, status.Error(codes.Unimplemented, "Favorite::operation failed")
+			return nil, status.Error(codes.Aborted, "Favorite::database exception")
 		}
 	}
+	// 待操作数
+	var numToAdd int64
+	if request.GetActionType() == 1 {
+		numToAdd = 1
+	} else if request.GetActionType() == 2 {
+		numToAdd = -1
+	} else {
+		return nil, status.Error(codes.InvalidArgument, "Favorite::invalid actionType")
+	}
 	// 用户点赞数+-1
-	if tx.Model(&userMsg).Update("favorite_count", userMsg.FavoriteCount+int64(numToAdd)).Error == nil {
+	if tx.Model(&userMsg).Update("favorite_count", userMsg.FavoriteCount+numToAdd).Error == nil {
 		// 视频的点赞总数+-1
-		if tx.Model(&video).Update("favorite_count", video.FavoriteCount+int64(numToAdd)).Error == nil {
+		if tx.Model(&video).Update("favorite_count", video.FavoriteCount+numToAdd).Error == nil {
 			// 视频发布者获得赞数+-1
-			if tx.Model(&videoMakerMsg).Update("total_favorited", videoMakerMsg.TotalFavorited.Int64+int64(numToAdd)).Error == nil {
+			if tx.Model(&videoMakerMsg).Update("total_favorited", videoMakerMsg.TotalFavorited.Int64+numToAdd).Error == nil {
 				// 提交事务
 				tx.Commit()
 				return &proto.DouyinFavoriteActionResponse{
@@ -85,5 +98,5 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	}
 	// 业务失败
 	tx.Rollback()
-	return nil, status.Error(codes.Unimplemented, "Favorite::operation failed")
+	return nil, status.Error(codes.Aborted, "Favorite::operation failed")
 }
