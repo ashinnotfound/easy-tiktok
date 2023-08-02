@@ -124,7 +124,7 @@ func (l Server) GetUserInfo(ctx context.Context, request *proto.DouyinUserReques
 	}
 	return &proto.DouyinUserResponse{
 		StatusCode: &Mysql.S.Ok,
-		StatusMsg:  &Mysql.S.BadMsg,
+		StatusMsg:  &Mysql.S.OkMsg,
 		User: &proto.User{
 			Id:              &user.ID,
 			Name:            &user.Username,
