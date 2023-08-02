@@ -36,6 +36,7 @@ func (impl *RelationServiceImpl) Action(ctx context.Context, request *pb.DouyinR
 		// 查询数据库出现问题
 		*response.StatusCode = constant.STATUS_FAILED
 		*response.StatusMsg = "数据库层面出现问题,Action接口调用失败"
+		global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
 		return response, result.Error
 	} else if result.RowsAffected == 0 {
 		// 数据库中没有记录
@@ -45,6 +46,7 @@ func (impl *RelationServiceImpl) Action(ctx context.Context, request *pb.DouyinR
 		} else if request.GetActionType() == 2 {
 			*response.StatusCode = constant.STATUS_FAILED
 			*response.StatusMsg = "无效的输入参数,请注意前端代码"
+			global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
 			return response, errors.New(*response.StatusMsg)
 		}
 	} else {
