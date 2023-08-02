@@ -17,5 +17,15 @@ func Route(e *gin.Engine) {
 			routerGroup.GET("/", userInfoHandler)
 		}
 		group.GET("/feed", videoFeedHandler)
+		favoriteGroup := group.Group("/favorite")
+		{
+			favoriteGroup.POST("/action/", favoriteHandler)
+			favoriteGroup.GET("/list/", getFavoriteListHandler)
+		}
+		commentGroup := group.Group("/comment")
+		{
+			commentGroup.POST("/action/", commentHandler)
+			commentGroup.GET("/list/", getCommentListHandler)
+		}
 	}
 }
