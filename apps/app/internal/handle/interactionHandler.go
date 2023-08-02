@@ -43,7 +43,27 @@ func getFavoriteListHandler(context *gin.Context) {
 }
 
 func commentHandler(context *gin.Context) {
+	token := context.Query("token")
+	videoId, _ := strconv.ParseInt(context.Query("video_id"), 10, 64)
+	actionTypeInt64, _ := strconv.ParseInt(context.Query("action_type"), 10, 32)
+	actionType := int32(actionTypeInt64)
+	commentText := context.Query("comment_text")
+	commentId, _ := strconv.ParseInt(context.Query("comment_id"), 10, 64)
 
+	req := interaction.DouyinCommentActionRequest{
+		Token:       &token,
+		VideoId:     &videoId,
+		ActionType:  &actionType,
+		CommentText: &commentText,
+		CommentId:   &commentId,
+	}
+
+	comment, err := rpc.GetInteractionRpc().Comment(context, &req)
+	if err != nil {
+		context.JSON(400, comment)
+		return
+	}
+	context.JSON(200, comment)
 }
 
 func getCommentListHandler(context *gin.Context) {
