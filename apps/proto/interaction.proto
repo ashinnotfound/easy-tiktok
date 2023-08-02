@@ -86,7 +86,7 @@ service interaction {
   //  POST /douyin/favorite/action/ - 赞操作  登录用户对视频的点赞和取消点赞操作。
   rpc favorite(douyin_favorite_action_request) returns (douyin_favorite_action_response);
   //  GET /douyin/favorite/list/ - 喜欢列表  登录用户的所有点赞视频。
-  rpc getFavoriteList(douyin_favorite_list_request) returns (douyin_favorite_action_response);
+  rpc getFavoriteList(douyin_favorite_list_request) returns (douyin_favorite_list_response);
   //  POST /douyin/comment/action/ - 评论操作  登录用户对视频进行评论。
   rpc comment(douyin_comment_action_request) returns (douyin_comment_action_response);
   //  GET /douyin/comment/list/ - 视频评论列表  查看视频的所有评论，按发布时间倒序。

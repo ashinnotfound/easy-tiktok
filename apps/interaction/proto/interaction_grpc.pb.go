@@ -25,7 +25,7 @@ type InteractionClient interface {
 	// POST /douyin/favorite/action/ - 赞操作  登录用户对视频的点赞和取消点赞操作。
 	Favorite(ctx context.Context, in *DouyinFavoriteActionRequest, opts ...grpc.CallOption) (*DouyinFavoriteActionResponse, error)
 	// GET /douyin/favorite/list/ - 喜欢列表  登录用户的所有点赞视频。
-	GetFavoriteList(ctx context.Context, in *DouyinFavoriteListRequest, opts ...grpc.CallOption) (*DouyinFavoriteActionResponse, error)
+	GetFavoriteList(ctx context.Context, in *DouyinFavoriteListRequest, opts ...grpc.CallOption) (*DouyinFavoriteListResponse, error)
 	// POST /douyin/comment/action/ - 评论操作  登录用户对视频进行评论。
 	Comment(ctx context.Context, in *DouyinCommentActionRequest, opts ...grpc.CallOption) (*DouyinCommentActionResponse, error)
 	// GET /douyin/comment/list/ - 视频评论列表  查看视频的所有评论，按发布时间倒序。
@@ -42,16 +42,16 @@ func NewInteractionClient(cc grpc.ClientConnInterface) InteractionClient {
 
 func (c *interactionClient) Favorite(ctx context.Context, in *DouyinFavoriteActionRequest, opts ...grpc.CallOption) (*DouyinFavoriteActionResponse, error) {
 	out := new(DouyinFavoriteActionResponse)
-	err := c.cc.Invoke(ctx, "/douyin.extra.first.interaction/favorite", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/interaction.interaction/favorite", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *interactionClient) GetFavoriteList(ctx context.Context, in *DouyinFavoriteListRequest, opts ...grpc.CallOption) (*DouyinFavoriteActionResponse, error) {
-	out := new(DouyinFavoriteActionResponse)
-	err := c.cc.Invoke(ctx, "/douyin.extra.first.interaction/getFavoriteList", in, out, opts...)
+func (c *interactionClient) GetFavoriteList(ctx context.Context, in *DouyinFavoriteListRequest, opts ...grpc.CallOption) (*DouyinFavoriteListResponse, error) {
+	out := new(DouyinFavoriteListResponse)
+	err := c.cc.Invoke(ctx, "/interaction.interaction/getFavoriteList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -60,7 +60,7 @@ func (c *interactionClient) GetFavoriteList(ctx context.Context, in *DouyinFavor
 
 func (c *interactionClient) Comment(ctx context.Context, in *DouyinCommentActionRequest, opts ...grpc.CallOption) (*DouyinCommentActionResponse, error) {
 	out := new(DouyinCommentActionResponse)
-	err := c.cc.Invoke(ctx, "/douyin.extra.first.interaction/comment", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/interaction.interaction/comment", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (c *interactionClient) Comment(ctx context.Context, in *DouyinCommentAction
 
 func (c *interactionClient) GetCommentList(ctx context.Context, in *DouyinCommentListRequest, opts ...grpc.CallOption) (*DouyinCommentListResponse, error) {
 	out := new(DouyinCommentListResponse)
-	err := c.cc.Invoke(ctx, "/douyin.extra.first.interaction/getCommentList", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/interaction.interaction/getCommentList", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ type InteractionServer interface {
 	// POST /douyin/favorite/action/ - 赞操作  登录用户对视频的点赞和取消点赞操作。
 	Favorite(context.Context, *DouyinFavoriteActionRequest) (*DouyinFavoriteActionResponse, error)
 	// GET /douyin/favorite/list/ - 喜欢列表  登录用户的所有点赞视频。
-	GetFavoriteList(context.Context, *DouyinFavoriteListRequest) (*DouyinFavoriteActionResponse, error)
+	GetFavoriteList(context.Context, *DouyinFavoriteListRequest) (*DouyinFavoriteListResponse, error)
 	// POST /douyin/comment/action/ - 评论操作  登录用户对视频进行评论。
 	Comment(context.Context, *DouyinCommentActionRequest) (*DouyinCommentActionResponse, error)
 	// GET /douyin/comment/list/ - 视频评论列表  查看视频的所有评论，按发布时间倒序。
@@ -98,7 +98,7 @@ type UnimplementedInteractionServer struct {
 func (UnimplementedInteractionServer) Favorite(context.Context, *DouyinFavoriteActionRequest) (*DouyinFavoriteActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Favorite not implemented")
 }
-func (UnimplementedInteractionServer) GetFavoriteList(context.Context, *DouyinFavoriteListRequest) (*DouyinFavoriteActionResponse, error) {
+func (UnimplementedInteractionServer) GetFavoriteList(context.Context, *DouyinFavoriteListRequest) (*DouyinFavoriteListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFavoriteList not implemented")
 }
 func (UnimplementedInteractionServer) Comment(context.Context, *DouyinCommentActionRequest) (*DouyinCommentActionResponse, error) {
@@ -130,7 +130,7 @@ func _Interaction_Favorite_Handler(srv interface{}, ctx context.Context, dec fun
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/douyin.extra.first.interaction/favorite",
+		FullMethod: "/interaction.interaction/favorite",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InteractionServer).Favorite(ctx, req.(*DouyinFavoriteActionRequest))
@@ -148,7 +148,7 @@ func _Interaction_GetFavoriteList_Handler(srv interface{}, ctx context.Context, 
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/douyin.extra.first.interaction/getFavoriteList",
+		FullMethod: "/interaction.interaction/getFavoriteList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InteractionServer).GetFavoriteList(ctx, req.(*DouyinFavoriteListRequest))
@@ -166,7 +166,7 @@ func _Interaction_Comment_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/douyin.extra.first.interaction/comment",
+		FullMethod: "/interaction.interaction/comment",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InteractionServer).Comment(ctx, req.(*DouyinCommentActionRequest))
@@ -184,7 +184,7 @@ func _Interaction_GetCommentList_Handler(srv interface{}, ctx context.Context, d
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/douyin.extra.first.interaction/getCommentList",
+		FullMethod: "/interaction.interaction/getCommentList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InteractionServer).GetCommentList(ctx, req.(*DouyinCommentListRequest))
@@ -196,7 +196,7 @@ func _Interaction_GetCommentList_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var Interaction_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "douyin.extra.first.interaction",
+	ServiceName: "interaction.interaction",
 	HandlerType: (*InteractionServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
