@@ -10,16 +10,16 @@ import (
 	"errors"
 )
 
-// RelationServiceImpl //
-// RelationService接口的实现类
+// SocialServerImpl //
+// SocialServer接口的实现类
 // Author lql
-type RelationServiceImpl struct {
-	pb.RelationServer
+type SocialServerImpl struct {
+	pb.SocialServer
 }
 
-// Action //
+// RelationAction //
 // 取消关注和关注用户
-func (impl *RelationServiceImpl) Action(ctx context.Context, request *pb.DouyinRelationActionRequest) (*pb.DouyinRelationActionResponse, error) {
+func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.DouyinRelationActionRequest) (*pb.DouyinRelationActionResponse, error) {
 	// 通过token获取用户id
 	userId := jwt.GetUserId(request.GetToken())
 
@@ -61,21 +61,35 @@ func (impl *RelationServiceImpl) Action(ctx context.Context, request *pb.DouyinR
 
 // GetFollowList //
 // 获取关注用户列表
-func (impl *RelationServiceImpl) GetFollowList(ctx context.Context, request *pb.DouyinRelationFollowListRequest) (*pb.DouyinRelationFollowListResponse, error) {
+func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.DouyinRelationFollowListRequest) (*pb.DouyinRelationFollowListResponse, error) {
 
 	return nil, nil
 }
 
 // GetFollowerList //
 // 获取登录用户粉丝列表
-func (impl *RelationServiceImpl) GetFollowerList(ctx context.Context, request *pb.DouyinRelationFollowerListRequest) (*pb.DouyinRelationFollowerListResponse, error) {
+func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.DouyinRelationFollowerListRequest) (*pb.DouyinRelationFollowerListResponse, error) {
 
 	return nil, nil
 }
 
 // GetFriendList //
 // 获取登录用户好友列表
-func (impl *RelationServiceImpl) GetFriendList(ctx context.Context, request *pb.DouyinRelationFriendListRequest) (*pb.DouyinRelationFriendListResponse, error) {
+func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.DouyinRelationFriendListRequest) (*pb.DouyinRelationFriendListResponse, error) {
+
+	return nil, nil
+}
+
+// Chat //
+// 获取对话消息
+func (impl *SocialServerImpl) Chat(ctx context.Context, request *pb.DouyinMessageChatRequest) (*pb.DouyinMessageChatResponse, error) {
+
+	return nil, nil
+}
+
+// MessageAction //
+// 消息操作：发送消息
+func (impl *SocialServerImpl) MessageAction(ctx context.Context, request *pb.DouyinMessageActionRequest) (*pb.DouyinMessageActionResponse, error) {
 
 	return nil, nil
 }

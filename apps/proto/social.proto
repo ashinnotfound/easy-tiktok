@@ -110,20 +110,17 @@ message douyin_message_action_response {
   optional string status_msg = 2; // 返回状态描述
 }
 
-service relation{
+service social{
   // 关系操作
-  rpc action(douyin_relation_action_request) returns(douyin_relation_action_response);
+  rpc relation_action(douyin_relation_action_request) returns(douyin_relation_action_response);
   // 用户关注列表
   rpc get_follow_list(douyin_relation_follow_list_request) returns(douyin_relation_follow_list_response);
   // 用户粉丝列表
   rpc get_follower_list(douyin_relation_follower_list_request) returns(douyin_relation_follower_list_response);
   // 用户好友列表
   rpc get_friend_list(douyin_relation_friend_list_request) returns(douyin_relation_friend_list_response);
-}
-
-service message{
   // 聊天记录
   rpc chat(douyin_message_chat_request) returns (douyin_message_chat_response);
   // 消息操作
-  rpc action(douyin_message_action_request) returns(douyin_message_action_response);
+  rpc message_action(douyin_message_action_request) returns(douyin_message_action_response);
 }

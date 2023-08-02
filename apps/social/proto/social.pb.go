@@ -1161,47 +1161,47 @@ var file_social_proto_rawDesc = []byte{
 	0x6f, 0x64, 0x65, 0x18, 0x01, 0x20, 0x02, 0x28, 0x05, 0x52, 0x0a, 0x73, 0x74, 0x61, 0x74, 0x75,
 	0x73, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x1d, 0x0a, 0x0a, 0x73, 0x74, 0x61, 0x74, 0x75, 0x73, 0x5f,
 	0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x09, 0x73, 0x74, 0x61, 0x74, 0x75,
-	0x73, 0x4d, 0x73, 0x67, 0x32, 0xb5, 0x03, 0x0a, 0x08, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
-	0x6e, 0x12, 0x59, 0x0a, 0x06, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x26, 0x2e, 0x73, 0x6f,
-	0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61,
-	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x71, 0x75,
-	0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75,
-	0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x63, 0x74,
-	0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6c, 0x0a, 0x0f,
-	0x67, 0x65, 0x74, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x12,
-	0x2b, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f,
-	0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f,
-	0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x73,
-	0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c,
-	0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x6c, 0x69, 0x73,
-	0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x72, 0x0a, 0x11, 0x67, 0x65,
-	0x74, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x12,
-	0x2d, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f,
-	0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65,
-	0x72, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e,
-	0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72,
-	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72,
-	0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6c,
-	0x0a, 0x0f, 0x67, 0x65, 0x74, 0x5f, 0x66, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x5f, 0x6c, 0x69, 0x73,
-	0x74, 0x12, 0x2b, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69,
-	0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x72, 0x69, 0x65, 0x6e,
-	0x64, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c,
-	0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72,
-	0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x5f, 0x6c,
-	0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xb5, 0x01, 0x0a,
-	0x07, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x12, 0x51, 0x0a, 0x04, 0x63, 0x68, 0x61, 0x74,
-	0x12, 0x23, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e,
+	0x73, 0x4d, 0x73, 0x67, 0x32, 0xf0, 0x04, 0x0a, 0x06, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x12,
+	0x62, 0x0a, 0x0f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x12, 0x26, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79,
+	0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x63, 0x74, 0x69,
+	0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x27, 0x2e, 0x73, 0x6f, 0x63,
+	0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74,
+	0x69, 0x6f, 0x6e, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x6c, 0x0a, 0x0f, 0x67, 0x65, 0x74, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f,
+	0x77, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x2b, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e,
+	0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75,
+	0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66, 0x6f, 0x6c,
+	0x6c, 0x6f, 0x77, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x72, 0x0a, 0x11, 0x67, 0x65, 0x74, 0x5f, 0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65,
+	0x72, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x2d, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e,
+	0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f,
+	0x66, 0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64,
+	0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66,
+	0x6f, 0x6c, 0x6c, 0x6f, 0x77, 0x65, 0x72, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x6c, 0x0a, 0x0f, 0x67, 0x65, 0x74, 0x5f, 0x66, 0x72, 0x69,
+	0x65, 0x6e, 0x64, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x12, 0x2b, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61,
+	0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f,
+	0x6e, 0x5f, 0x66, 0x72, 0x69, 0x65, 0x6e, 0x64, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65,
+	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2c, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64,
+	0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x72, 0x65, 0x6c, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x66,
+	0x72, 0x69, 0x65, 0x6e, 0x64, 0x5f, 0x6c, 0x69, 0x73, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x12, 0x51, 0x0a, 0x04, 0x63, 0x68, 0x61, 0x74, 0x12, 0x23, 0x2e, 0x73, 0x6f,
+	0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73,
+	0x61, 0x67, 0x65, 0x5f, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x24, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e,
 	0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x63, 0x68, 0x61, 0x74, 0x5f, 0x72, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x24, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64,
-	0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x63, 0x68,
-	0x61, 0x74, 0x5f, 0x72, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x57, 0x0a, 0x06, 0x61,
-	0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x25, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64,
-	0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x61, 0x63,
-	0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x73,
-	0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73,
-	0x73, 0x61, 0x67, 0x65, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x42, 0x17, 0x5a, 0x15, 0x2e, 0x2e, 0x2f, 0x73, 0x6f, 0x63, 0x69, 0x61,
-	0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x5f, 0x0a, 0x0e, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67,
+	0x65, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x12, 0x25, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61,
+	0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65,
+	0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x26, 0x2e, 0x73, 0x6f, 0x63, 0x69, 0x61, 0x6c, 0x2e, 0x64, 0x6f, 0x75, 0x79, 0x69, 0x6e, 0x5f,
+	0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x61, 0x63, 0x74, 0x69, 0x6f, 0x6e, 0x5f, 0x72,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x42, 0x17, 0x5a, 0x15, 0x2e, 0x2e, 0x2f, 0x73, 0x6f,
+	0x63, 0x69, 0x61, 0x6c, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x3b, 0x70, 0x72, 0x6f, 0x74, 0x6f,
 }
 
 var (
@@ -1240,18 +1240,18 @@ var file_social_proto_depIdxs = []int32{
 	0,  // 2: social.FriendUser.user:type_name -> social.User
 	7,  // 3: social.douyin_relation_friend_list_response.user_list:type_name -> social.FriendUser
 	10, // 4: social.douyin_message_chat_response.message_list:type_name -> social.Message
-	1,  // 5: social.relation.action:input_type -> social.douyin_relation_action_request
-	3,  // 6: social.relation.get_follow_list:input_type -> social.douyin_relation_follow_list_request
-	5,  // 7: social.relation.get_follower_list:input_type -> social.douyin_relation_follower_list_request
-	8,  // 8: social.relation.get_friend_list:input_type -> social.douyin_relation_friend_list_request
-	11, // 9: social.message.chat:input_type -> social.douyin_message_chat_request
-	13, // 10: social.message.action:input_type -> social.douyin_message_action_request
-	2,  // 11: social.relation.action:output_type -> social.douyin_relation_action_response
-	4,  // 12: social.relation.get_follow_list:output_type -> social.douyin_relation_follow_list_response
-	6,  // 13: social.relation.get_follower_list:output_type -> social.douyin_relation_follower_list_response
-	9,  // 14: social.relation.get_friend_list:output_type -> social.douyin_relation_friend_list_response
-	12, // 15: social.message.chat:output_type -> social.douyin_message_chat_response
-	14, // 16: social.message.action:output_type -> social.douyin_message_action_response
+	1,  // 5: social.social.relation_action:input_type -> social.douyin_relation_action_request
+	3,  // 6: social.social.get_follow_list:input_type -> social.douyin_relation_follow_list_request
+	5,  // 7: social.social.get_follower_list:input_type -> social.douyin_relation_follower_list_request
+	8,  // 8: social.social.get_friend_list:input_type -> social.douyin_relation_friend_list_request
+	11, // 9: social.social.chat:input_type -> social.douyin_message_chat_request
+	13, // 10: social.social.message_action:input_type -> social.douyin_message_action_request
+	2,  // 11: social.social.relation_action:output_type -> social.douyin_relation_action_response
+	4,  // 12: social.social.get_follow_list:output_type -> social.douyin_relation_follow_list_response
+	6,  // 13: social.social.get_follower_list:output_type -> social.douyin_relation_follower_list_response
+	9,  // 14: social.social.get_friend_list:output_type -> social.douyin_relation_friend_list_response
+	12, // 15: social.social.chat:output_type -> social.douyin_message_chat_response
+	14, // 16: social.social.message_action:output_type -> social.douyin_message_action_response
 	11, // [11:17] is the sub-list for method output_type
 	5,  // [5:11] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
@@ -1454,7 +1454,7 @@ func file_social_proto_init() {
 			NumEnums:      0,
 			NumMessages:   15,
 			NumExtensions: 0,
-			NumServices:   2,
+			NumServices:   1,
 		},
 		GoTypes:           file_social_proto_goTypes,
 		DependencyIndexes: file_social_proto_depIdxs,
@@ -1474,300 +1474,264 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// RelationClient is the client API for Relation service.
+// SocialClient is the client API for Social service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type RelationClient interface {
+type SocialClient interface {
 	// 关系操作
-	Action(ctx context.Context, in *DouyinRelationActionRequest, opts ...grpc.CallOption) (*DouyinRelationActionResponse, error)
+	RelationAction(ctx context.Context, in *DouyinRelationActionRequest, opts ...grpc.CallOption) (*DouyinRelationActionResponse, error)
 	// 用户关注列表
 	GetFollowList(ctx context.Context, in *DouyinRelationFollowListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowListResponse, error)
 	// 用户粉丝列表
 	GetFollowerList(ctx context.Context, in *DouyinRelationFollowerListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowerListResponse, error)
 	// 用户好友列表
 	GetFriendList(ctx context.Context, in *DouyinRelationFriendListRequest, opts ...grpc.CallOption) (*DouyinRelationFriendListResponse, error)
+	// 聊天记录
+	Chat(ctx context.Context, in *DouyinMessageChatRequest, opts ...grpc.CallOption) (*DouyinMessageChatResponse, error)
+	// 消息操作
+	MessageAction(ctx context.Context, in *DouyinMessageActionRequest, opts ...grpc.CallOption) (*DouyinMessageActionResponse, error)
 }
 
-type relationClient struct {
+type socialClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewRelationClient(cc grpc.ClientConnInterface) RelationClient {
-	return &relationClient{cc}
+func NewSocialClient(cc grpc.ClientConnInterface) SocialClient {
+	return &socialClient{cc}
 }
 
-func (c *relationClient) Action(ctx context.Context, in *DouyinRelationActionRequest, opts ...grpc.CallOption) (*DouyinRelationActionResponse, error) {
+func (c *socialClient) RelationAction(ctx context.Context, in *DouyinRelationActionRequest, opts ...grpc.CallOption) (*DouyinRelationActionResponse, error) {
 	out := new(DouyinRelationActionResponse)
-	err := c.cc.Invoke(ctx, "/social.relation/action", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/social.social/relation_action", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *relationClient) GetFollowList(ctx context.Context, in *DouyinRelationFollowListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowListResponse, error) {
+func (c *socialClient) GetFollowList(ctx context.Context, in *DouyinRelationFollowListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowListResponse, error) {
 	out := new(DouyinRelationFollowListResponse)
-	err := c.cc.Invoke(ctx, "/social.relation/get_follow_list", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/social.social/get_follow_list", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *relationClient) GetFollowerList(ctx context.Context, in *DouyinRelationFollowerListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowerListResponse, error) {
+func (c *socialClient) GetFollowerList(ctx context.Context, in *DouyinRelationFollowerListRequest, opts ...grpc.CallOption) (*DouyinRelationFollowerListResponse, error) {
 	out := new(DouyinRelationFollowerListResponse)
-	err := c.cc.Invoke(ctx, "/social.relation/get_follower_list", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/social.social/get_follower_list", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *relationClient) GetFriendList(ctx context.Context, in *DouyinRelationFriendListRequest, opts ...grpc.CallOption) (*DouyinRelationFriendListResponse, error) {
+func (c *socialClient) GetFriendList(ctx context.Context, in *DouyinRelationFriendListRequest, opts ...grpc.CallOption) (*DouyinRelationFriendListResponse, error) {
 	out := new(DouyinRelationFriendListResponse)
-	err := c.cc.Invoke(ctx, "/social.relation/get_friend_list", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/social.social/get_friend_list", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// RelationServer is the server API for Relation service.
-type RelationServer interface {
+func (c *socialClient) Chat(ctx context.Context, in *DouyinMessageChatRequest, opts ...grpc.CallOption) (*DouyinMessageChatResponse, error) {
+	out := new(DouyinMessageChatResponse)
+	err := c.cc.Invoke(ctx, "/social.social/chat", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *socialClient) MessageAction(ctx context.Context, in *DouyinMessageActionRequest, opts ...grpc.CallOption) (*DouyinMessageActionResponse, error) {
+	out := new(DouyinMessageActionResponse)
+	err := c.cc.Invoke(ctx, "/social.social/message_action", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// SocialServer is the server API for Social service.
+type SocialServer interface {
 	// 关系操作
-	Action(context.Context, *DouyinRelationActionRequest) (*DouyinRelationActionResponse, error)
+	RelationAction(context.Context, *DouyinRelationActionRequest) (*DouyinRelationActionResponse, error)
 	// 用户关注列表
 	GetFollowList(context.Context, *DouyinRelationFollowListRequest) (*DouyinRelationFollowListResponse, error)
 	// 用户粉丝列表
 	GetFollowerList(context.Context, *DouyinRelationFollowerListRequest) (*DouyinRelationFollowerListResponse, error)
 	// 用户好友列表
 	GetFriendList(context.Context, *DouyinRelationFriendListRequest) (*DouyinRelationFriendListResponse, error)
+	// 聊天记录
+	Chat(context.Context, *DouyinMessageChatRequest) (*DouyinMessageChatResponse, error)
+	// 消息操作
+	MessageAction(context.Context, *DouyinMessageActionRequest) (*DouyinMessageActionResponse, error)
 }
 
-// UnimplementedRelationServer can be embedded to have forward compatible implementations.
-type UnimplementedRelationServer struct {
+// UnimplementedSocialServer can be embedded to have forward compatible implementations.
+type UnimplementedSocialServer struct {
 }
 
-func (*UnimplementedRelationServer) Action(context.Context, *DouyinRelationActionRequest) (*DouyinRelationActionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Action not implemented")
+func (*UnimplementedSocialServer) RelationAction(context.Context, *DouyinRelationActionRequest) (*DouyinRelationActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method RelationAction not implemented")
 }
-func (*UnimplementedRelationServer) GetFollowList(context.Context, *DouyinRelationFollowListRequest) (*DouyinRelationFollowListResponse, error) {
+func (*UnimplementedSocialServer) GetFollowList(context.Context, *DouyinRelationFollowListRequest) (*DouyinRelationFollowListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFollowList not implemented")
 }
-func (*UnimplementedRelationServer) GetFollowerList(context.Context, *DouyinRelationFollowerListRequest) (*DouyinRelationFollowerListResponse, error) {
+func (*UnimplementedSocialServer) GetFollowerList(context.Context, *DouyinRelationFollowerListRequest) (*DouyinRelationFollowerListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFollowerList not implemented")
 }
-func (*UnimplementedRelationServer) GetFriendList(context.Context, *DouyinRelationFriendListRequest) (*DouyinRelationFriendListResponse, error) {
+func (*UnimplementedSocialServer) GetFriendList(context.Context, *DouyinRelationFriendListRequest) (*DouyinRelationFriendListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetFriendList not implemented")
 }
-
-func RegisterRelationServer(s *grpc.Server, srv RelationServer) {
-	s.RegisterService(&_Relation_serviceDesc, srv)
+func (*UnimplementedSocialServer) Chat(context.Context, *DouyinMessageChatRequest) (*DouyinMessageChatResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Chat not implemented")
+}
+func (*UnimplementedSocialServer) MessageAction(context.Context, *DouyinMessageActionRequest) (*DouyinMessageActionResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method MessageAction not implemented")
 }
 
-func _Relation_Action_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func RegisterSocialServer(s *grpc.Server, srv SocialServer) {
+	s.RegisterService(&_Social_serviceDesc, srv)
+}
+
+func _Social_RelationAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinRelationActionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RelationServer).Action(ctx, in)
+		return srv.(SocialServer).RelationAction(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.relation/Action",
+		FullMethod: "/social.social/RelationAction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RelationServer).Action(ctx, req.(*DouyinRelationActionRequest))
+		return srv.(SocialServer).RelationAction(ctx, req.(*DouyinRelationActionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Relation_GetFollowList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Social_GetFollowList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinRelationFollowListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RelationServer).GetFollowList(ctx, in)
+		return srv.(SocialServer).GetFollowList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.relation/GetFollowList",
+		FullMethod: "/social.social/GetFollowList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RelationServer).GetFollowList(ctx, req.(*DouyinRelationFollowListRequest))
+		return srv.(SocialServer).GetFollowList(ctx, req.(*DouyinRelationFollowListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Relation_GetFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Social_GetFollowerList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinRelationFollowerListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RelationServer).GetFollowerList(ctx, in)
+		return srv.(SocialServer).GetFollowerList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.relation/GetFollowerList",
+		FullMethod: "/social.social/GetFollowerList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RelationServer).GetFollowerList(ctx, req.(*DouyinRelationFollowerListRequest))
+		return srv.(SocialServer).GetFollowerList(ctx, req.(*DouyinRelationFollowerListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Relation_GetFriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Social_GetFriendList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinRelationFriendListRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(RelationServer).GetFriendList(ctx, in)
+		return srv.(SocialServer).GetFriendList(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.relation/GetFriendList",
+		FullMethod: "/social.social/GetFriendList",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(RelationServer).GetFriendList(ctx, req.(*DouyinRelationFriendListRequest))
+		return srv.(SocialServer).GetFriendList(ctx, req.(*DouyinRelationFriendListRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Relation_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "social.relation",
-	HandlerType: (*RelationServer)(nil),
-	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "action",
-			Handler:    _Relation_Action_Handler,
-		},
-		{
-			MethodName: "get_follow_list",
-			Handler:    _Relation_GetFollowList_Handler,
-		},
-		{
-			MethodName: "get_follower_list",
-			Handler:    _Relation_GetFollowerList_Handler,
-		},
-		{
-			MethodName: "get_friend_list",
-			Handler:    _Relation_GetFriendList_Handler,
-		},
-	},
-	Streams:  []grpc.StreamDesc{},
-	Metadata: "social.proto",
-}
-
-// MessageClient is the client API for Message service.
-//
-// For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type MessageClient interface {
-	// 聊天记录
-	Chat(ctx context.Context, in *DouyinMessageChatRequest, opts ...grpc.CallOption) (*DouyinMessageChatResponse, error)
-	// 消息操作
-	Action(ctx context.Context, in *DouyinMessageActionRequest, opts ...grpc.CallOption) (*DouyinMessageActionResponse, error)
-}
-
-type messageClient struct {
-	cc grpc.ClientConnInterface
-}
-
-func NewMessageClient(cc grpc.ClientConnInterface) MessageClient {
-	return &messageClient{cc}
-}
-
-func (c *messageClient) Chat(ctx context.Context, in *DouyinMessageChatRequest, opts ...grpc.CallOption) (*DouyinMessageChatResponse, error) {
-	out := new(DouyinMessageChatResponse)
-	err := c.cc.Invoke(ctx, "/social.message/chat", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *messageClient) Action(ctx context.Context, in *DouyinMessageActionRequest, opts ...grpc.CallOption) (*DouyinMessageActionResponse, error) {
-	out := new(DouyinMessageActionResponse)
-	err := c.cc.Invoke(ctx, "/social.message/action", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// MessageServer is the server API for Message service.
-type MessageServer interface {
-	// 聊天记录
-	Chat(context.Context, *DouyinMessageChatRequest) (*DouyinMessageChatResponse, error)
-	// 消息操作
-	Action(context.Context, *DouyinMessageActionRequest) (*DouyinMessageActionResponse, error)
-}
-
-// UnimplementedMessageServer can be embedded to have forward compatible implementations.
-type UnimplementedMessageServer struct {
-}
-
-func (*UnimplementedMessageServer) Chat(context.Context, *DouyinMessageChatRequest) (*DouyinMessageChatResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Chat not implemented")
-}
-func (*UnimplementedMessageServer) Action(context.Context, *DouyinMessageActionRequest) (*DouyinMessageActionResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Action not implemented")
-}
-
-func RegisterMessageServer(s *grpc.Server, srv MessageServer) {
-	s.RegisterService(&_Message_serviceDesc, srv)
-}
-
-func _Message_Chat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Social_Chat_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinMessageChatRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MessageServer).Chat(ctx, in)
+		return srv.(SocialServer).Chat(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.message/Chat",
+		FullMethod: "/social.social/Chat",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessageServer).Chat(ctx, req.(*DouyinMessageChatRequest))
+		return srv.(SocialServer).Chat(ctx, req.(*DouyinMessageChatRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _Message_Action_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Social_MessageAction_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DouyinMessageActionRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MessageServer).Action(ctx, in)
+		return srv.(SocialServer).MessageAction(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/social.message/Action",
+		FullMethod: "/social.social/MessageAction",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessageServer).Action(ctx, req.(*DouyinMessageActionRequest))
+		return srv.(SocialServer).MessageAction(ctx, req.(*DouyinMessageActionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _Message_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "social.message",
-	HandlerType: (*MessageServer)(nil),
+var _Social_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "social.social",
+	HandlerType: (*SocialServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "chat",
-			Handler:    _Message_Chat_Handler,
+			MethodName: "relation_action",
+			Handler:    _Social_RelationAction_Handler,
 		},
 		{
-			MethodName: "action",
-			Handler:    _Message_Action_Handler,
+			MethodName: "get_follow_list",
+			Handler:    _Social_GetFollowList_Handler,
+		},
+		{
+			MethodName: "get_follower_list",
+			Handler:    _Social_GetFollowerList_Handler,
+		},
+		{
+			MethodName: "get_friend_list",
+			Handler:    _Social_GetFriendList_Handler,
+		},
+		{
+			MethodName: "chat",
+			Handler:    _Social_Chat_Handler,
+		},
+		{
+			MethodName: "message_action",
+			Handler:    _Social_MessageAction_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
