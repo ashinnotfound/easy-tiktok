@@ -66,28 +66,56 @@ func (Server) Comment(ctx context.Context, request *proto.DouyinCommentActionReq
 				}
 			}
 			// 创建评论记录
-			if tx.Create(&Mysql.Comment{
+			comment := Mysql.Comment{
+				VideoID:    request.GetVideoId(),
 				Content:    request.GetCommentText(),
 				CreateDate: time.Now().Format("01-02"),
 				UserMsg:    userMsg,
-			}).Error != nil {
+			}
+			if tx.Create(&comment).Error != nil {
 				tx.Rollback()
 				return nil, status.Error(codes.Aborted, "Comment::database exception")
 			}
+			// 提交事务
+			tx.Commit()
+			statusMsg := "评论成功!!!"
+			isFollow := false
+			return &proto.DouyinCommentActionResponse{
+				StatusCode: &Mysql.S.Ok,
+				StatusMsg:  &statusMsg,
+				Comment: &proto.Comment{
+					Id: &comment.ID,
+					User: &proto.User{
+						Id:              &userMsg.ID,
+						Name:            &userMsg.Username,
+						FollowCount:     &userMsg.FollowCount,
+						FollowerCount:   &userMsg.FollowerCount,
+						IsFollow:        &isFollow,
+						Avatar:          &userMsg.Avatar.String,
+						BackgroundImage: &userMsg.BackgroundImage.String,
+						Signature:       &userMsg.Signature.String,
+						TotalFavorited:  &userMsg.TotalFavorited.Int64,
+						WorkCount:       &userMsg.WorkCount,
+						FavoriteCount:   &userMsg.FavoriteCount,
+					},
+					Content:    request.CommentText,
+					CreateDate: &comment.CreateDate,
+				},
+			}, nil
 		} else {
 			// 删除评论记录
 			if tx.Delete(&Mysql.Comment{}, request.GetCommentId()).Error != nil {
 				tx.Rollback()
 				return nil, status.Error(codes.Aborted, "Comment::database exception")
 			}
+			// 提交事务
+			tx.Commit()
+			statusMsg := "删除评论成功!!!"
+			return &proto.DouyinCommentActionResponse{
+				StatusCode: &Mysql.S.Ok,
+				StatusMsg:  &statusMsg,
+			}, nil
 		}
-		// 提交事务
-		tx.Commit()
-		statusMsg := "评论成功!!!"
-		return &proto.DouyinCommentActionResponse{
-			StatusCode: &Mysql.S.Ok,
-			StatusMsg:  &statusMsg,
-		}, nil
 	}
 	// 业务失败
 	tx.Rollback()
