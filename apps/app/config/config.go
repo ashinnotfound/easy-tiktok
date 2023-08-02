@@ -14,6 +14,7 @@ type config struct {
 	UserHost        string `yaml:"UserHost"`
 	VideoHost       string `yaml:"VideoHost"`
 	InteractionHost string `yaml:"InteractionHost"`
+	SocialHost      string `yaml:"SocialHost"`
 }
 
 func Initial() {
