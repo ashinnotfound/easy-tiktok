@@ -1,6 +1,7 @@
 package Mysql
 
 import (
+	"easy-tiktok/apps/global"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"time"
@@ -39,6 +40,7 @@ func init() {
 		OkMsg:  "",
 		BadMsg: "500",
 	}
+	global.DB = _db
 }
 
 func GetDB() *gorm.DB {
