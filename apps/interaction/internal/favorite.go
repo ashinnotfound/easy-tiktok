@@ -40,8 +40,8 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	var video Mysql.Video
 	tx.First(&video, request.GetVideoId())
 	// 查找视频发布者
-	var videoMakerMsg Mysql.UserMsg
-	tx.First(&videoMakerMsg, video.UserMsgID)
+	var authorMsg Mysql.UserMsg
+	tx.First(&authorMsg, video.UserMsgID)
 
 	// 查找视频点赞记录 判断点赞/取消点赞
 	var like Mysql.Like
@@ -86,7 +86,7 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 		// 视频的点赞总数+-1
 		if tx.Model(&video).Update("favorite_count", video.FavoriteCount+numToAdd).Error == nil {
 			// 视频发布者获得赞数+-1
-			if tx.Model(&videoMakerMsg).Update("total_favorited", videoMakerMsg.TotalFavorited.Int64+numToAdd).Error == nil {
+			if tx.Model(&authorMsg).Update("total_favorited", authorMsg.TotalFavorited.Int64+numToAdd).Error == nil {
 				// 提交事务
 				tx.Commit()
 				return &proto.DouyinFavoriteActionResponse{
@@ -99,4 +99,86 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	// 业务失败
 	tx.Rollback()
 	return nil, status.Error(codes.Aborted, "Favorite::operation failed")
+}
+
+// GetFavoriteList GET /douyin/favorite/list/ - 喜欢列表  登录用户的所有点赞视频。
+func (Server) GetFavoriteList(ctx context.Context, request *proto.DouyinFavoriteListRequest) (*proto.DouyinFavoriteListResponse, error) {
+	select {
+	// 判断请求是否被取消
+	case <-ctx.Done():
+		return nil, status.Error(codes.Canceled, "Favorite::request is canceled")
+	default:
+		// 继续执行
+	}
+
+	// 验证token
+	if request.GetToken() == "" {
+		return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
+	}
+	userId := util.GetUserId(request.GetToken())
+	if userId != request.GetUserId() {
+		return nil, status.Error(codes.Unauthenticated, "GetFavoriteList::invalid token")
+	}
+
+	db := Mysql.GetDB()
+	// 查找当前用户的点赞视频
+	var like []Mysql.Like
+	if err := db.Where("liker_id = ?", userId).Find(&like).Error; err != nil {
+		return nil, status.Error(codes.Aborted, "GetFavoriteList::database exception")
+	}
+	// 查找数据库的视频列表
+	var video []Mysql.Video
+	for _, v := range like {
+		var currentVideo Mysql.Video
+		if err := db.First(&currentVideo, v.VideoID).Error; err != nil {
+			// TODO 后续对查找失败的视频做进一步处理
+			continue
+		}
+		video = append(video, currentVideo)
+	}
+	// 填充返回值视频列表
+	var videoList []*proto.Video
+	isFavorite := true
+	for _, v := range video {
+		var follow Mysql.Follow
+		isFollow := true
+		if err := db.Where("be_followed = ? AND follower = ?", v.UserMsgID, userId).First(&follow).Error; err != nil {
+			// 找不到记录说明没关注
+			if errors.Is(err, gorm.ErrRecordNotFound) {
+				isFollow = false
+			} else {
+				return nil, status.Error(codes.Aborted, "GetFavoriteList::database exception")
+			}
+		}
+
+		videoList = append(videoList, &proto.Video{
+			Id: &v.ID,
+			Author: &proto.User{
+				Id:              &v.UserMsg.ID,
+				Name:            &v.UserMsg.Username,
+				FollowCount:     &v.UserMsg.FollowCount,
+				FollowerCount:   &v.UserMsg.FollowerCount,
+				IsFollow:        &isFollow,
+				Avatar:          &v.UserMsg.Avatar.String,
+				BackgroundImage: &v.UserMsg.BackgroundImage.String,
+				Signature:       &v.UserMsg.Signature.String,
+				TotalFavorited:  &v.UserMsg.TotalFavorited.Int64,
+				WorkCount:       &v.UserMsg.WorkCount,
+				FavoriteCount:   &v.UserMsg.FavoriteCount,
+			},
+			PlayUrl:       &v.PlayUrl,
+			CoverUrl:      &v.CoverUrl,
+			FavoriteCount: &v.FavoriteCount,
+			CommentCount:  &v.CommentCount,
+			IsFavorite:    &isFavorite,
+			Title:         &v.Title,
+		})
+	}
+
+	statusMsg := "获取用户喜欢视频列表成功"
+	return &proto.DouyinFavoriteListResponse{
+		StatusCode: &Mysql.S.Ok,
+		StatusMsg:  &statusMsg,
+		VideoList:  videoList,
+	}, nil
 }
