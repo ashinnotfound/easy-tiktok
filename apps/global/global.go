@@ -1,7 +1,11 @@
 package global
 
-import "gorm.io/gorm"
+import (
+	"github.com/sirupsen/logrus"
+	"gorm.io/gorm"
+)
 
 var (
-	DB *gorm.DB
+	DB     *gorm.DB
+	LOGGER *logrus.Logger
 )
