@@ -13,6 +13,7 @@ import (
 
 func main() {
 	logger := logrus.New()
+	config.Initial()
 	listen, err := net.Listen(config.C.NetworkType, config.C.InteractionHost)
 	if err != nil {
 		println("连接interaction服务不是很成功")
