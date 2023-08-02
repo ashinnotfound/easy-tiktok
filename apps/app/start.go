@@ -1,7 +1,7 @@
 package main
 
 import (
-	"easy-tiktok/apps/app/internal/config"
+	"easy-tiktok/apps/app/config"
 	"easy-tiktok/apps/app/internal/handle"
 	"easy-tiktok/apps/app/internal/rpc"
 	"github.com/gin-gonic/gin"
