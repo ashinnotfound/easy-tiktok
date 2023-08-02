@@ -132,12 +132,6 @@ func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentLi
 		// 继续执行
 	}
 
-	// 验证token
-	if request.GetToken() == "" {
-		return nil, status.Error(codes.Unauthenticated, "Favorite::invalid token")
-	}
-	userId := util.GetUserId(request.GetToken())
-
 	// 查找数据库中当前视频的所有评论
 	var comment []Mysql.Comment
 	db := Mysql.GetDB()
@@ -153,12 +147,19 @@ func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentLi
 		// 查询当前用户是否关注了评论用户
 		var follow Mysql.Follow
 		isFollow := true
-		if err := db.Where("be_followed = ? AND follower = ?", userMsg.ID, userId).First(&follow).Error; err != nil {
-			// 找不到记录说明没关注
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				isFollow = false
-			} else {
-				return nil, status.Error(codes.Aborted, "GetCommentList::database exception")
+		// 验证token
+		if request.GetToken() == "" {
+			// 没登陆则没关注
+			isFollow = false
+		} else {
+			userId := util.GetUserId(request.GetToken())
+			if err := db.Where("be_followed = ? AND follower = ?", userMsg.ID, userId).First(&follow).Error; err != nil {
+				// 找不到记录说明没关注
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					isFollow = false
+				} else {
+					return nil, status.Error(codes.Aborted, "GetCommentList::database exception")
+				}
 			}
 		}
 		commentList = append(commentList, &proto.Comment{
