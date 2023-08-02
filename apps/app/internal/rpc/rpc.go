@@ -13,7 +13,7 @@ import (
 var userRpc user.UserClient
 var videoRpc video.VideoClient
 var interactionRpc interaction.InteractionClient
-var socialRpc *social.SocialClient
+var socialRpc social.SocialClient
 
 func Initial() {
 	dial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
@@ -30,10 +30,13 @@ func Initial() {
 	if err != nil {
 		panic(err)
 	}
+
+	socialDial, err := grpc.Dial(config.C.SocialHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// 初始化Rpc服务客户端
 	userRpc = user.NewUserClient(dial)
 	videoRpc = video.NewVideoClient(dial1)
 	interactionRpc = interaction.NewInteractionClient(interactionDial)
+	socialRpc = social.NewSocialClient(socialDial)
 }
 
 func GetUserRpc() user.UserClient {
@@ -50,6 +53,6 @@ func GetInteractionRpc() interaction.InteractionClient {
 
 // GetSocialRpc //
 // 获取社交模块的rpc客户端
-func GetSocialRpc() *social.SocialClient {
+func GetSocialRpc() social.SocialClient {
 	return socialRpc
 }
