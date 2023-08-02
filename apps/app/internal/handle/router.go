@@ -2,6 +2,7 @@ package handle
 
 import (
 	"easy-tiktok/apps/app/internal/middleware"
+	"easy-tiktok/apps/app/internal/router"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,5 +18,18 @@ func Route(e *gin.Engine) {
 			routerGroup.GET("/", userInfoHandler)
 		}
 		group.GET("/feed", videoFeedHandler)
+		favoriteGroup := group.Group("/favorite")
+		{
+			favoriteGroup.POST("/action/", favoriteHandler)
+			favoriteGroup.GET("/list/", getFavoriteListHandler)
+		}
+		commentGroup := group.Group("/comment")
+		{
+			commentGroup.POST("/action/", commentHandler)
+			commentGroup.GET("/list/", getCommentListHandler)
+		}
 	}
+
+	socialRouter := router.SocialRouter{RootGroup: group}
+	socialRouter.InitializeRouter()
 }
