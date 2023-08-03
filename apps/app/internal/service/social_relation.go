@@ -84,5 +84,20 @@ func (service *RelationService) FollowerList(c *gin.Context) {
 // FriendList //
 // 获取好友列表
 func (service *RelationService) FriendList(c *gin.Context) {
+	// 获取参数
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	token := c.Query("token")
 
+	socialClient := rpc.GetSocialRpc()
+	response, err := socialClient.GetFollowList(context.Background(),
+		&pb.DouyinRelationFollowListRequest{
+			UserId: &userId,
+			Token:  &token,
+		})
+	if err != nil {
+		global.LOGGER.Errorf("RelationService::FollowList方法出错,reason: %v\n", err)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
