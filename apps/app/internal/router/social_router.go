@@ -30,7 +30,7 @@ func (router *SocialRouter) InitializeRouter() {
 	}
 	messageGroup := router.RootGroup.Group("/message")
 	{
-		messageGroup.GET("/action/", messageService.Action)
+		messageGroup.POST("/action/", messageService.Action)
 		messageGroup.GET("/chat/", messageService.Chat)
 	}
 }
