@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"easy-tiktok/apps/app/internal/rpc"
+	"easy-tiktok/apps/global"
 	pb "easy-tiktok/apps/social/proto"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -22,6 +23,7 @@ func (service *RelationService) Action(c *gin.Context) {
 	toUserId, _ := strconv.ParseInt(c.Query("to_user_id"), 10, 64)
 	actionTypeInt64, _ := strconv.ParseInt(c.Query("action_type"), 10, 32)
 	actionType := int32(actionTypeInt64)
+
 	socialClient := rpc.GetSocialRpc()
 	response, err := socialClient.RelationAction(context.Background(),
 		&pb.DouyinRelationActionRequest{
@@ -30,7 +32,7 @@ func (service *RelationService) Action(c *gin.Context) {
 			ActionType: &actionType,
 		})
 	if err != nil {
-		//global.LOGGER.Errorf("RelationService::Action方法出错,reason: %v\n", err)
+		global.LOGGER.Errorf("RelationService::Action方法出错,reason: %v\n", err)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
@@ -40,7 +42,22 @@ func (service *RelationService) Action(c *gin.Context) {
 // FollowList //
 // 获取关注列表
 func (service *RelationService) FollowList(c *gin.Context) {
+	// 获取参数
+	userId, _ := strconv.ParseInt(c.Query("user_id"), 10, 64)
+	token := c.Query("token")
 
+	socialClient := rpc.GetSocialRpc()
+	response, err := socialClient.GetFollowList(context.Background(),
+		&pb.DouyinRelationFollowListRequest{
+			UserId: &userId,
+			Token:  &token,
+		})
+	if err != nil {
+		global.LOGGER.Errorf("RelationService::FollowList方法出错,reason: %v\n", err)
+		c.JSON(http.StatusBadRequest, response)
+		return
+	}
+	c.JSON(http.StatusOK, response)
 }
 
 // FollowerList //
