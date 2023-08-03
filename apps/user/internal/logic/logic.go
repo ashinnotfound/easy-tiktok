@@ -2,6 +2,7 @@ package logic
 
 import (
 	"database/sql"
+	"easy-tiktok/apps/social/model"
 	"easy-tiktok/apps/user/proto"
 	Mysql "easy-tiktok/db/mysql"
 	"easy-tiktok/util"
@@ -103,10 +104,10 @@ func (l Server) GetUserInfo(ctx context.Context, request *proto.DouyinUserReques
 	viewerId := util.GetUserId(request.GetToken())
 	db := Mysql.GetDB()
 	user := Mysql.UserMsg{}
-	follow := Mysql.Follow{}
+	var follow model.UserFollow
 	db.Where("id = ?", id).First(&user)
 	var result bool
-	if db.Where("be_followed = ? and follower = ?", id, viewerId).First(&follow).Error != nil {
+	if db.Where("follow_id = ? AND user_id = ?", id, viewerId).First(&follow).Error != nil {
 		result = false
 	} else {
 		result = true

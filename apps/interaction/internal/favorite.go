@@ -2,7 +2,9 @@ package internal
 
 import (
 	"context"
+	"easy-tiktok/apps/constant"
 	"easy-tiktok/apps/interaction/proto"
+	"easy-tiktok/apps/social/model"
 	Mysql "easy-tiktok/db/mysql"
 	"easy-tiktok/util"
 	"errors"
@@ -140,11 +142,11 @@ func (Server) GetFavoriteList(ctx context.Context, request *proto.DouyinFavorite
 	// 填充返回值视频列表
 	var videoList []*proto.Video
 	isFavorite := true
-	for i, _ := range video {
+	for i := range video {
 		v := video[i]
-		var follow Mysql.Follow
+		var follow model.UserFollow
 		isFollow := true
-		if err := db.Where("be_followed = ? AND follower = ?", v.UserMsgID, userId).First(&follow).Error; err != nil {
+		if err := db.Where("follow_id = ? AND user_id = ? AND status = ?", v.UserMsgID, userId, constant.RELATION_FOLLOW).First(&follow).Error; err != nil {
 			// 找不到记录说明没关注
 			if errors.Is(err, gorm.ErrRecordNotFound) {
 				isFollow = false

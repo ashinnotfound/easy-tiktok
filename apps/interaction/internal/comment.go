@@ -2,7 +2,9 @@ package internal
 
 import (
 	"context"
+	"easy-tiktok/apps/constant"
 	"easy-tiktok/apps/interaction/proto"
+	"easy-tiktok/apps/social/model"
 	Mysql "easy-tiktok/db/mysql"
 	"easy-tiktok/util"
 	"errors"
@@ -146,7 +148,7 @@ func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentLi
 		// 评论用户信息
 		userMsg := v.UserMsg
 		// 查询当前用户是否关注了评论用户
-		var follow Mysql.Follow
+		var follow model.UserFollow
 		isFollow := true
 		// 验证token
 		if request.GetToken() == "" {
@@ -154,7 +156,7 @@ func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentLi
 			isFollow = false
 		} else {
 			userId := util.GetUserId(request.GetToken())
-			if err := db.Where("be_followed = ? AND follower = ?", userMsg.ID, userId).First(&follow).Error; err != nil {
+			if err := db.Where("follow_id = ? AND user_id = ? AND status = ?", userMsg.ID, userId, constant.RELATION_FOLLOW).First(&follow).Error; err != nil {
 				// 找不到记录说明没关注
 				if errors.Is(err, gorm.ErrRecordNotFound) {
 					isFollow = false
