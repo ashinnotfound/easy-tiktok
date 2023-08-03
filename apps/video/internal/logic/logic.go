@@ -84,6 +84,7 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	}
 	//得到userId
 	userId := util.GetUserId(token)
+
 	//封装结构体对象
 	videoMsg := Mysql.Video{
 		Model:         Mysql.Model{},
@@ -99,6 +100,15 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	if err := model.Create(&videoMsg).Error; err != nil {
 		return nil, model.Error
 	}
+
+	var user Mysql.UserMsg
+	//通过userid获取其对应的作品数,并更新(获得了videoHash证明视频上传成功,故可以执行更新作品数操作)
+	model.Where("id=?", userId).Find(&user)
+	//让发布者的作品数加一
+	user.WorkCount += 1
+	//保存修改
+	model.Select("work_count").Save(&user)
+
 	return &proto.DouyinPublishActionResponse{
 		StatusCode: &Mysql.S.Ok,
 		StatusMsg:  &Mysql.S.OkMsg,
@@ -138,6 +148,7 @@ func (s Server) List(ctx context.Context, request *proto.DouyinPublishListReques
 			}
 		}
 	}
+
 	//调用loadVideos函数
 	videoList, _ := loadVideos(followMap, likesMap, videos)
 	return &proto.DouyinPublishListResponse{
