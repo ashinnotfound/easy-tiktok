@@ -1,14 +1,20 @@
 package main
 
-import Mysql "easy-tiktok/db/mysql"
+import (
+	Mysql "easy-tiktok/db/mysql"
+	"fmt"
+)
 
 func main() {
 
 	db := Mysql.GetDB()
 	var list []Mysql.Video
-	if db.Preload("UserMsg").Find(&list).Error != nil {
-		return
+	//db.Preload("UserMsg").Where("").Find(&list)
+	db.Preload("UserMsg").Where("userMsg_id = ?", 20).Find(&list)
+
+	for index, _ := range list {
+		fmt.Println(list[index])
+		fmt.Println("\n")
 	}
-	println(list[0].UserMsg.ID)
 
 }

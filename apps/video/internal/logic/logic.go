@@ -70,27 +70,20 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	}
 	//数据库对象
 	model := Mysql.GetDB()
-
 	//获取token
 	token := request.GetToken()
-
 	//视频标题
 	title := request.GetTitle()
-
 	//获取用户传输的视频
 	videoPut := request.GetData()
-
 	//IPFS得到cid
 	sh := shell.NewShell("10.21.23.163:6666")
 	videoHash, err := sh.Add(bytes.NewReader(videoPut))
-
 	if err != nil {
 		return nil, err
 	}
-
 	//得到userId
 	userId := util.GetUserId(token)
-
 	//封装结构体对象
 	videoMsg := Mysql.Video{
 		Model:         Mysql.Model{},
@@ -121,27 +114,41 @@ func (s Server) List(ctx context.Context, request *proto.DouyinPublishListReques
 		// 继续执行
 	}
 
-	//获取数据库对象
-	model := Mysql.GetDB()
-
-	//获取token
-	token := request.GetToken()
-
-	//通过token获取userid
-	userId := util.GetUserId(token)
-
-	var list []*proto.Video
-
-	//根据userId在video表中查找
-	model.Where("userMsg_id = ?", userId).Find(&list)
+	db := Mysql.GetDB()
+	var videos []Mysql.Video
+	if db.Preload("UserMsg").Where("userMsg_id=?", request.GetUserId()).Find(&videos).Error != nil {
+		return nil, nil
+	}
+	followMap := map[int64]bool{}
+	likesMap := map[int64]bool{}
+	//判断用户是否登录
+	//登录则显示对应关注点赞关系
+	if *request.Token != "" {
+		userid := util.GetUserId(*request.Token)
+		var follow []Mysql.Follow
+		if db.Where("follower =?", userid).Find(&follow).Error == nil {
+			for _, v := range follow {
+				followMap[v.BeFollowed.Int64] = true
+			}
+		}
+		var like []Mysql.Like
+		if db.Where("liker_id =?", userid).Find(&like).Error == nil {
+			for _, v := range like {
+				likesMap[v.VideoID] = true
+			}
+		}
+	}
+	//调用loadVideos函数
+	videoList, _ := loadVideos(followMap, likesMap, videos)
 	return &proto.DouyinPublishListResponse{
 		StatusCode: &Mysql.S.Ok,
 		StatusMsg:  &Mysql.S.OkMsg,
-		VideoList:  list,
+		VideoList:  videoList,
 	}, nil
 }
 
 // 装载video
+
 func loadVideos(followMap map[int64]bool, likesMap map[int64]bool, videos []Mysql.Video) ([]*proto.Video, int64) {
 	var nextTime int64
 	var videoList []*proto.Video

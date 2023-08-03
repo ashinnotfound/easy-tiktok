@@ -74,10 +74,10 @@ func videoListHandler(context *gin.Context) {
 
 	videoRpc := rpc.GetVideoRpc()
 	list, err2 := videoRpc.List(context, &req)
-
 	if err2 != nil {
 		panic(err2)
 		context.JSON(400, err)
+		return
 	}
 
 	context.JSON(200, &list)
