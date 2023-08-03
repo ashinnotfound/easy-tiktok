@@ -6,8 +6,11 @@ import (
 	"easy-tiktok/apps/global"
 	"easy-tiktok/apps/social/model"
 	pb "easy-tiktok/apps/social/proto"
+	orm "easy-tiktok/db/mysql"
 	jwt "easy-tiktok/util"
 	"errors"
+	"gorm.io/gorm"
+	"sync"
 )
 
 // SocialServerImpl //
@@ -36,9 +39,9 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 	if result := userFollowTable.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).Limit(1).Find(&po); result.Error != nil {
 		// 查询数据库出现问题
 		response.StatusCode = constant.RPC_STATUS.StatusFailed()
-		*response.StatusMsg = "数据库层面出现问题,Action接口调用失败"
-		global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
-		return &pb.DouyinRelationActionResponse{StatusCode: constant.RPC_STATUS.StatusFailed()}, result.Error
+		*response.StatusMsg = "数据库层面出现问题,RelationAction接口调用失败"
+		global.LOGGER.Warnf("RelationServer::Action error: %v\n", result.Error)
+		return response, result.Error
 	} else if result.RowsAffected == 0 {
 		// 数据库中没有记录
 		if request.GetActionType() == 1 {
@@ -56,15 +59,80 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 			userFollowTable.Model(&po).Update("status", po.Status)
 		}
 	}
-	*response.StatusMsg = "Action操作成功"
+	*response.StatusMsg = "RelationAction操作成功"
 	return response, nil
 }
 
 // GetFollowList //
 // 获取关注用户列表
 func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.DouyinRelationFollowListRequest) (*pb.DouyinRelationFollowListResponse, error) {
+	global.LOGGER.Info("3")
+	// 初始化响应
+	response := &pb.DouyinRelationFollowListResponse{}
+	response.StatusMsg = new(string)
+	response.StatusCode = constant.RPC_STATUS.StatusOK()
+	wq := sync.WaitGroup{}
+	// 初始化err
+	var err error = nil
+	// 声明userMsg
+	userMsgChan := make(chan orm.UserMsg)
+	var userFollowList []model.UserFollow
+	if result := global.DB.Table(model.USER_FOLLOW_TABLE).Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList); result.Error != nil {
+		global.LOGGER.Info("4")
+		response.StatusCode = constant.RPC_STATUS.StatusFailed()
+		*response.StatusMsg = "数据库层面出现问题,GetFollowList接口调用失败"
+		global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", result.Error)
+		return response, result.Error
+	} else if result.RowsAffected > 0 {
+		var followedUserList []*pb.User
+		// 数据库读取
+		wq.Add(1)
+		go func(list []model.UserFollow) {
+			defer wq.Done()
+			// 关闭管道
+			defer close(userMsgChan)
+			for _, user := range userFollowList {
+				var userMsg orm.UserMsg
+				err = global.DB.First(&userMsg, user.FollowId).Error
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", err)
+				} else {
+					userMsgChan <- userMsg
+				}
+			}
+		}(userFollowList)
+		wq.Add(1)
+		// 添加到followedUserList
+		go func(res *pb.DouyinRelationFollowListResponse) {
+			defer wq.Done()
+			status := true
+			for {
+				if userMsg, ok := <-userMsgChan; ok {
+					followedUserList = append(followedUserList, &pb.User{
+						Id:              &userMsg.ID,
+						Name:            &userMsg.Username,
+						FollowCount:     &userMsg.FollowCount,
+						FollowerCount:   &userMsg.FollowerCount,
+						IsFollow:        &status,
+						Avatar:          &userMsg.Avatar.String,
+						BackgroundImage: &userMsg.BackgroundImage.String,
+						Signature:       &userMsg.Signature.String,
+						TotalFavorited:  &userMsg.TotalFavorited.Int64,
+						WorkCount:       &userMsg.WorkCount,
+						FavoriteCount:   &userMsg.FavoriteCount,
+					})
+				} else {
+					// 管道中的数据已经取完
+					res.UserList = followedUserList
+					break
+				}
+			}
+		}(response)
+	}
 
-	return nil, nil
+	wq.Wait()
+	*response.StatusMsg = "GetFollowList操作成功"
+	return response, err
 }
 
 // GetFollowerList //
