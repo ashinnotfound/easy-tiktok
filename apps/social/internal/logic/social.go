@@ -66,7 +66,6 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 // GetFollowList //
 // 获取关注用户列表
 func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.DouyinRelationFollowListRequest) (*pb.DouyinRelationFollowListResponse, error) {
-	global.LOGGER.Info("3")
 	// 初始化响应
 	response := &pb.DouyinRelationFollowListResponse{}
 	response.StatusMsg = new(string)
@@ -138,8 +137,72 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 // GetFollowerList //
 // 获取登录用户粉丝列表
 func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.DouyinRelationFollowerListRequest) (*pb.DouyinRelationFollowerListResponse, error) {
+	// 初始化响应
+	response := &pb.DouyinRelationFollowerListResponse{}
+	response.StatusMsg = new(string)
+	response.StatusCode = constant.RPC_STATUS.StatusOK()
+	wq := sync.WaitGroup{}
+	// 初始化err
+	var err error = nil
+	// 声明userMsg
+	userMsgChan := make(chan orm.UserMsg)
+	var userFollowerList []model.UserFollow
+	if result := global.DB.Table(model.USER_FOLLOW_TABLE).Where("follow_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowerList); result.Error != nil {
+		global.LOGGER.Info("4")
+		response.StatusCode = constant.RPC_STATUS.StatusFailed()
+		*response.StatusMsg = "数据库层面出现问题,GetFollowList接口调用失败"
+		global.LOGGER.Warnf("RelationServer::GetFollowerList error: %v", result.Error)
+		return response, result.Error
+	} else if result.RowsAffected > 0 {
+		var followedUserList []*pb.User
+		// 数据库读取
+		wq.Add(1)
+		go func(list []model.UserFollow) {
+			defer wq.Done()
+			// 关闭管道
+			defer close(userMsgChan)
+			for _, user := range userFollowerList {
+				var userMsg orm.UserMsg
+				err = global.DB.First(&userMsg, user.FollowId).Error
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					global.LOGGER.Warnf("RelationServer::GetFollowerList error: %v", err)
+				} else {
+					userMsgChan <- userMsg
+				}
+			}
+		}(userFollowerList)
+		wq.Add(1)
+		// 添加到followedUserList
+		go func(res *pb.DouyinRelationFollowerListResponse) {
+			defer wq.Done()
+			status := true
+			for {
+				if userMsg, ok := <-userMsgChan; ok {
+					followedUserList = append(followedUserList, &pb.User{
+						Id:              &userMsg.ID,
+						Name:            &userMsg.Username,
+						FollowCount:     &userMsg.FollowCount,
+						FollowerCount:   &userMsg.FollowerCount,
+						IsFollow:        &status,
+						Avatar:          &userMsg.Avatar.String,
+						BackgroundImage: &userMsg.BackgroundImage.String,
+						Signature:       &userMsg.Signature.String,
+						TotalFavorited:  &userMsg.TotalFavorited.Int64,
+						WorkCount:       &userMsg.WorkCount,
+						FavoriteCount:   &userMsg.FavoriteCount,
+					})
+				} else {
+					// 管道中的数据已经取完
+					res.UserList = followedUserList
+					break
+				}
+			}
+		}(response)
+	}
 
-	return nil, nil
+	wq.Wait()
+	*response.StatusMsg = "GetFollowerList操作成功"
+	return response, err
 }
 
 // GetFriendList //
