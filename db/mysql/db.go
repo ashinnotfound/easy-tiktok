@@ -17,10 +17,9 @@ type Model struct {
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 type Status struct {
-	Ok     int32
-	Bad    int32
-	OkMsg  string
-	BadMsg string
+	Ok    int32
+	Bad   int32
+	OkMsg string
 }
 
 func init() {
@@ -35,10 +34,9 @@ func init() {
 	sqlDB.SetMaxOpenConns(100) //设置数据库连接池最大连接数
 	sqlDB.SetMaxIdleConns(20)  //连接池最大允许的空闲连接数，如果没有sql任务需要执行的连接数大于20，超过的连接会被连接池关闭。
 	S = Status{
-		Ok:     0,
-		Bad:    1,
-		OkMsg:  "",
-		BadMsg: "500",
+		Ok:    0,
+		Bad:   1,
+		OkMsg: "",
 	}
 	global.DB = _db
 }
