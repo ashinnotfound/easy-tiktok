@@ -66,28 +66,56 @@ func (Server) Comment(ctx context.Context, request *proto.DouyinCommentActionReq
 				}
 			}
 			// 创建评论记录
-			if tx.Create(&Mysql.Comment{
+			comment := Mysql.Comment{
+				VideoID:    request.GetVideoId(),
 				Content:    request.GetCommentText(),
 				CreateDate: time.Now().Format("01-02"),
 				UserMsg:    userMsg,
-			}).Error != nil {
+			}
+			if tx.Create(&comment).Error != nil {
 				tx.Rollback()
 				return nil, status.Error(codes.Aborted, "Comment::database exception")
 			}
+			// 提交事务
+			tx.Commit()
+			statusMsg := "评论成功!!!"
+			isFollow := false
+			return &proto.DouyinCommentActionResponse{
+				StatusCode: &Mysql.S.Ok,
+				StatusMsg:  &statusMsg,
+				Comment: &proto.Comment{
+					Id: &comment.ID,
+					User: &proto.User{
+						Id:              &userMsg.ID,
+						Name:            &userMsg.Username,
+						FollowCount:     &userMsg.FollowCount,
+						FollowerCount:   &userMsg.FollowerCount,
+						IsFollow:        &isFollow,
+						Avatar:          &userMsg.Avatar.String,
+						BackgroundImage: &userMsg.BackgroundImage.String,
+						Signature:       &userMsg.Signature.String,
+						TotalFavorited:  &userMsg.TotalFavorited.Int64,
+						WorkCount:       &userMsg.WorkCount,
+						FavoriteCount:   &userMsg.FavoriteCount,
+					},
+					Content:    request.CommentText,
+					CreateDate: &comment.CreateDate,
+				},
+			}, nil
 		} else {
 			// 删除评论记录
 			if tx.Delete(&Mysql.Comment{}, request.GetCommentId()).Error != nil {
 				tx.Rollback()
 				return nil, status.Error(codes.Aborted, "Comment::database exception")
 			}
+			// 提交事务
+			tx.Commit()
+			statusMsg := "删除评论成功!!!"
+			return &proto.DouyinCommentActionResponse{
+				StatusCode: &Mysql.S.Ok,
+				StatusMsg:  &statusMsg,
+			}, nil
 		}
-		// 提交事务
-		tx.Commit()
-		statusMsg := "评论成功!!!"
-		return &proto.DouyinCommentActionResponse{
-			StatusCode: &Mysql.S.Ok,
-			StatusMsg:  &statusMsg,
-		}, nil
 	}
 	// 业务失败
 	tx.Rollback()
@@ -96,5 +124,67 @@ func (Server) Comment(ctx context.Context, request *proto.DouyinCommentActionReq
 
 // GetCommentList GET /douyin/comment/list/ - 视频评论列表  查看视频的所有评论，按发布时间倒序。
 func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentListRequest) (*proto.DouyinCommentListResponse, error) {
-	return nil, nil
+	select {
+	// 判断请求是否被取消
+	case <-ctx.Done():
+		return nil, status.Error(codes.Canceled, "Favorite::request is canceled")
+	default:
+		// 继续执行
+	}
+
+	// 查找数据库中当前视频的所有评论
+	var comment []Mysql.Comment
+	db := Mysql.GetDB()
+	if db.Where("video_id = ?", request.GetVideoId()).Find(&comment).Error != nil {
+		return nil, status.Error(codes.Aborted, "GetCommentList::database exception")
+	}
+
+	// 填充返回值评论列表
+	var commentList []*proto.Comment
+	for _, v := range comment {
+		// 评论用户信息
+		userMsg := v.UserMsg
+		// 查询当前用户是否关注了评论用户
+		var follow Mysql.Follow
+		isFollow := true
+		// 验证token
+		if request.GetToken() == "" {
+			// 没登陆则没关注
+			isFollow = false
+		} else {
+			userId := util.GetUserId(request.GetToken())
+			if err := db.Where("be_followed = ? AND follower = ?", userMsg.ID, userId).First(&follow).Error; err != nil {
+				// 找不到记录说明没关注
+				if errors.Is(err, gorm.ErrRecordNotFound) {
+					isFollow = false
+				} else {
+					return nil, status.Error(codes.Aborted, "GetCommentList::database exception")
+				}
+			}
+		}
+		commentList = append(commentList, &proto.Comment{
+			Id: &v.ID,
+			User: &proto.User{
+				Id:              &userMsg.ID,
+				Name:            &userMsg.Username,
+				FollowCount:     &userMsg.FollowCount,
+				FollowerCount:   &userMsg.FollowerCount,
+				IsFollow:        &isFollow,
+				Avatar:          &userMsg.Avatar.String,
+				BackgroundImage: &userMsg.BackgroundImage.String,
+				Signature:       &userMsg.Signature.String,
+				TotalFavorited:  &userMsg.TotalFavorited.Int64,
+				WorkCount:       &userMsg.WorkCount,
+				FavoriteCount:   &userMsg.FavoriteCount,
+			},
+			Content:    &v.Content,
+			CreateDate: &v.CreateDate,
+		})
+	}
+	statusMsg := "获取视频评论列表成功"
+	return &proto.DouyinCommentListResponse{
+		StatusCode:  &Mysql.S.Ok,
+		StatusMsg:   &statusMsg,
+		CommentList: commentList,
+	}, nil
 }

@@ -18,6 +18,7 @@ type Like struct {
 
 type Comment struct {
 	Model
+	VideoID    int64   `gorm:"column:video_id;NOT NULL;comment:'视频id'"`
 	UserMsg    UserMsg `gorm:"foreignKey:id;references:ID;"`
 	Content    string  `gorm:"column:content;NOT NULL;comment:'评论内容'"`
 	CreateDate string  `gorm:"column:create_date;NOT NULL;comment:'评论发布日期，格式 mm-dd'"`
