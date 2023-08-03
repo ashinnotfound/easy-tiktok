@@ -10,6 +10,7 @@ import (
 func main() {
 	engine := gin.Default()
 	config.Initial()
+
 	rpc.Initial()
 	handle.Route(engine)
 	err := engine.Run(":8888")

@@ -16,12 +16,11 @@ var interactionRpc interaction.InteractionClient
 var socialRpc social.SocialClient
 
 func Initial() {
-	dial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	userDial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
-
-	dial1, err := grpc.Dial(config.C.VideoHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	videoDial, err := grpc.Dial(config.C.VideoHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
@@ -33,8 +32,8 @@ func Initial() {
 
 	socialDial, err := grpc.Dial(config.C.SocialHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// 初始化Rpc服务客户端
-	userRpc = user.NewUserClient(dial)
-	videoRpc = video.NewVideoClient(dial1)
+	userRpc = user.NewUserClient(userDial)
+	videoRpc = video.NewVideoClient(videoDial)
 	interactionRpc = interaction.NewInteractionClient(interactionDial)
 	socialRpc = social.NewSocialClient(socialDial)
 }

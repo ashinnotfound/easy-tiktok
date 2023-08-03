@@ -61,4 +61,25 @@ func videoActionHandler(context *gin.Context) {
 
 func videoListHandler(context *gin.Context) {
 
+	token := context.Query("token")
+	userId, err := strconv.ParseInt(context.Query("user_id"), 10, 64)
+	if err != nil {
+		panic(err)
+	}
+
+	req := video.DouyinPublishListRequest{
+		UserId: &userId,
+		Token:  &token,
+	}
+
+	videoRpc := rpc.GetVideoRpc()
+	list, err2 := videoRpc.List(context, &req)
+
+	if err2 != nil {
+		panic(err2)
+		context.JSON(400, err)
+	}
+
+	context.JSON(200, &list)
+
 }
