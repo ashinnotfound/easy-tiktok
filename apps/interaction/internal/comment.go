@@ -135,13 +135,14 @@ func (Server) GetCommentList(ctx context.Context, request *proto.DouyinCommentLi
 	// 查找数据库中当前视频的所有评论
 	var comment []Mysql.Comment
 	db := Mysql.GetDB()
-	if db.Where("video_id = ?", request.GetVideoId()).Find(&comment).Error != nil {
+	if db.Preload("UserMsg").Where("video_id = ?", request.GetVideoId()).Find(&comment).Error != nil {
 		return nil, status.Error(codes.Aborted, "GetCommentList::database exception")
 	}
 
 	// 填充返回值评论列表
 	var commentList []*proto.Comment
-	for _, v := range comment {
+	for i, _ := range comment {
+		v := comment[i]
 		// 评论用户信息
 		userMsg := v.UserMsg
 		// 查询当前用户是否关注了评论用户
