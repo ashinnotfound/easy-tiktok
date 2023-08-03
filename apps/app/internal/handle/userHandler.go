@@ -11,6 +11,7 @@ import (
 func loginHandler(c *gin.Context) {
 	username := c.Query("username")
 	password := c.Query("password")
+
 	req := user.DouyinUserLoginRequest{
 		Username: &username,
 		Password: &password,

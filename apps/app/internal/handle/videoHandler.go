@@ -5,11 +5,12 @@ import (
 	"easy-tiktok/apps/app/internal/rpc"
 	video "easy-tiktok/apps/video/proto"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"io"
 	"strconv"
 )
 
 func videoFeedHandler(context *gin.Context) {
+
 	token := context.Query("token")
 	time := context.Query("latest_time")
 	parseInt, err := strconv.ParseInt(time, 10, 64)
@@ -28,27 +29,34 @@ func videoFeedHandler(context *gin.Context) {
 
 func videoActionHandler(context *gin.Context) {
 
-	videoFile := context.Query("data")
+	title := context.PostForm("title")
+	token := context.PostForm("token")
 
-	videoFileBytes := []byte(videoFile)
+	formFile, _, err2 := context.Request.FormFile("data")
+	if err2 != nil {
+		panic(err2)
+	}
 
-	token := context.Query("token")
-	title := context.Query("title")
+	videoFile, err3 := io.ReadAll(formFile)
+
+	defer formFile.Close()
+	if err3 != nil {
+		panic(err3)
+	}
 
 	req := video.DouyinPublishActionRequest{
 		Token: &token,
-		Data:  videoFileBytes,
+		Data:  videoFile,
 		Title: &title,
 	}
-
 	videoRpc := rpc.GetVideoRpc()
-	action, err := videoRpc.Action(context2.Background(), &req)
+	action, err := videoRpc.Action(context, &req)
 	if err != nil {
 		panic(err)
-		context.JSON(200, err)
+		context.JSON(400, err)
 		return
 	}
-	context.JSON(http.StatusOK, &action)
+	context.JSON(200, &action)
 }
 
 func videoListHandler(context *gin.Context) {

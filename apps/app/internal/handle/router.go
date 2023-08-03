@@ -30,8 +30,8 @@ func Route(e *gin.Engine) {
 		}
 		publishGroup := group.Group("/publish")
 		{
-			publishGroup.POST("/action", videoActionHandler)
-			publishGroup.GET("/list", videoListHandler)
+			publishGroup.POST("/action/", videoActionHandler)
+			publishGroup.GET("/list/", videoListHandler)
 		}
 	}
 

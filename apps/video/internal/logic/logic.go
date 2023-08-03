@@ -95,7 +95,6 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	default:
 		// 继续执行
 	}
-
 	//数据库对象
 	model := Mysql.GetDB()
 
