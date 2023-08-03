@@ -140,7 +140,8 @@ func (Server) GetFavoriteList(ctx context.Context, request *proto.DouyinFavorite
 	// 填充返回值视频列表
 	var videoList []*proto.Video
 	isFavorite := true
-	for _, v := range video {
+	for i, _ := range video {
+		v := video[i]
 		var follow Mysql.Follow
 		isFollow := true
 		if err := db.Where("be_followed = ? AND follower = ?", v.UserMsgID, userId).First(&follow).Error; err != nil {
