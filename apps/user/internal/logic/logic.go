@@ -75,21 +75,10 @@ func (l Server) Register(ctx context.Context, request *proto.DouyinUserRegisterR
 	if err := model.Create(&entry).Error; err != nil {
 		return nil, model.Error
 	}
-	msg := Mysql.UserMsg{
-		FollowCount:     0,
-		FollowerCount:   0,
-		Avatar:          sql.NullString{String: "https:ipfs.io/ipfs/bafkreiacrj7wlkvtbckd3cemrkcl3tu73upwiacu5debjjn6viyepaghka", Valid: true},
-		BackgroundImage: sql.NullString{String: "https:ipfs.io/ipfs/bafkreiacrj7wlkvtbckd3cemrkcl3tu73upwiacu5debjjn6viyepaghka", Valid: true},
-		Signature:       sql.NullString{String: "我想重新做人", Valid: true},
-		TotalFavorited:  sql.NullInt64{Valid: true},
-		WorkCount:       0,
-		FavoriteCount:   0,
-		Username:        entry.Username,
-	}
+	msg := userMsgInit(entry.Username)
 	if err := model.Create(&msg).Error; err != nil {
 		return nil, model.Error
 	}
-	println(entry.ID)
 	token, err := util.GetToken(entry.ID)
 	if err != nil {
 		return nil, err
@@ -139,4 +128,18 @@ func (l Server) GetUserInfo(ctx context.Context, request *proto.DouyinUserReques
 			FavoriteCount:   &user.FavoriteCount,
 		},
 	}, nil
+}
+
+func userMsgInit(username string) Mysql.UserMsg {
+	return Mysql.UserMsg{
+		FollowCount:     0,
+		FollowerCount:   0,
+		Avatar:          sql.NullString{String: "https:ipfs.io/ipfs/bafkreiacrj7wlkvtbckd3cemrkcl3tu73upwiacu5debjjn6viyepaghka", Valid: true},
+		BackgroundImage: sql.NullString{String: "https:ipfs.io/ipfs/bafkreiacrj7wlkvtbckd3cemrkcl3tu73upwiacu5debjjn6viyepaghka", Valid: true},
+		Signature:       sql.NullString{String: "我想重新做人", Valid: true},
+		TotalFavorited:  sql.NullInt64{Valid: true},
+		WorkCount:       0,
+		FavoriteCount:   0,
+		Username:        username,
+	}
 }
