@@ -49,7 +49,8 @@ func (s Server) Feed(ctx context.Context, request *proto.DouyinFeedRequest) (*pr
 	}
 	nextTime := int64(1)
 	var list2 []*proto.Video
-	for _, v := range list {
+	for i, _ := range list {
+		v := list[i]
 		if v.CreatedAt.Unix() > nextTime {
 			nextTime = v.CreatedAt.Unix()
 		}
