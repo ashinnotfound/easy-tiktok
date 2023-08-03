@@ -20,7 +20,6 @@ type config struct {
 func Initial() {
 	dir, _ := os.Getwd()
 	yamlPath := filepath.Join(dir, "apps/app/etc/cfg.yaml")
-	println(yamlPath)
 	file, err := os.ReadFile(yamlPath)
 	if err != nil {
 		panic(err)
