@@ -19,7 +19,7 @@ func main() {
 		return
 	}
 	server := grpc.NewServer(grpc.UnaryInterceptor(grpc_logrus.UnaryServerInterceptor(logrus.NewEntry(logger))),
-		grpc.StreamInterceptor(grpc_logrus.StreamServerInterceptor(logrus.NewEntry(logger))))
+		grpc.StreamInterceptor(grpc_logrus.StreamServerInterceptor(logrus.NewEntry(logger))), grpc.MaxRecvMsgSize(200*1024*1024))
 	proto.RegisterVideoServer(server, logic.Server{})
 	reflection.Register(server)
 	if err := server.Serve(listen); err != nil {
