@@ -2,6 +2,8 @@ package logic
 
 import (
 	"bytes"
+	"easy-tiktok/apps/constant"
+	"easy-tiktok/apps/social/model"
 	proto2 "easy-tiktok/apps/user/proto"
 	"easy-tiktok/apps/video/proto"
 	Mysql "easy-tiktok/db/mysql"
@@ -37,10 +39,10 @@ func (s Server) Feed(ctx context.Context, request *proto.DouyinFeedRequest) (*pr
 	//登录则显示对应关注点赞关系
 	if *request.Token != "" {
 		userid := util.GetUserId(*request.Token)
-		var follow []Mysql.Follow
-		if db.Where("follower =?", userid).Find(&follow).Error == nil {
+		var follow []model.UserFollow
+		if db.Where("user_id = ? AND status = ?", userid, constant.RELATION_FOLLOW).Find(&follow).Error == nil {
 			for _, v := range follow {
-				followMap[v.BeFollowed.Int64] = true
+				followMap[v.FollowId] = true
 			}
 		}
 		var like []Mysql.Like
@@ -135,10 +137,10 @@ func (s Server) List(ctx context.Context, request *proto.DouyinPublishListReques
 	//登录则显示对应关注点赞关系
 	if *request.Token != "" {
 		userid := util.GetUserId(*request.Token)
-		var follow []Mysql.Follow
-		if db.Where("follower =?", userid).Find(&follow).Error == nil {
+		var follow []model.UserFollow
+		if db.Where("user_id = ? AND status = ?", userid, constant.RELATION_FOLLOW).Find(&follow).Error == nil {
 			for _, v := range follow {
-				followMap[v.BeFollowed.Int64] = true
+				followMap[v.FollowId] = true
 			}
 		}
 		var like []Mysql.Like

@@ -23,16 +23,6 @@ type UserMsg struct {
 	Username        string         `gorm:"column:username;NOT NULL"`
 }
 
-type Follow struct {
-	Model
-	BeFollowed sql.NullInt64 `gorm:"column:be_followed"`
-	Follower   sql.NullInt64 `gorm:"column:follower"`
-}
-
-func (f *Follow) TableName() string {
-	return "follow"
-}
-
 func (u *UserMsg) TableName() string {
 	return "user_msg"
 }
