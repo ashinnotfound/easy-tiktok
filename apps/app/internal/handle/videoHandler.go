@@ -43,7 +43,6 @@ func videoActionHandler(context *gin.Context) {
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Println("data:", string(data))
 	//把字节流重新放回body
 	context.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
 	//转成结构体类型进行参数的接收
