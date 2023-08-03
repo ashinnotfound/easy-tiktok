@@ -9,7 +9,7 @@ import (
 // init //
 // 初始化logrus的日志类
 // Author lql
-func init() {
+func LogInit() {
 	// 初始化新Logger示例
 	logger := logrus.New()
 	// 设置输出
