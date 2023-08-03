@@ -29,24 +29,23 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 	var po model.UserFollow
 	// 初始化响应
 	response := &pb.DouyinRelationActionResponse{}
-	response.StatusCode = new(int32)
 	response.StatusMsg = new(string)
-	*response.StatusCode = constant.STATUS_OK
+	response.StatusCode = constant.RPC_STATUS.StatusOK()
 
 	// 逻辑判断
 	if result := userFollowTable.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).Limit(1).Find(&po); result.Error != nil {
 		// 查询数据库出现问题
-		*response.StatusCode = constant.STATUS_FAILED
+		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,Action接口调用失败"
 		global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
-		return response, result.Error
+		return &pb.DouyinRelationActionResponse{StatusCode: constant.RPC_STATUS.StatusFailed()}, result.Error
 	} else if result.RowsAffected == 0 {
 		// 数据库中没有记录
 		if request.GetActionType() == 1 {
 			po = model.UserFollow{UserId: userId, FollowId: request.GetToUserId(), Status: request.GetActionType()}
 			userFollowTable.Create(&po)
 		} else if request.GetActionType() == 2 {
-			*response.StatusCode = constant.STATUS_FAILED
+			response.StatusCode = constant.RPC_STATUS.StatusFailed()
 			*response.StatusMsg = "无效的输入参数,请注意前端代码"
 			global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
 			return response, errors.New(*response.StatusMsg)
