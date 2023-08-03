@@ -10,6 +10,7 @@ import (
 	jwt "easy-tiktok/util"
 	"errors"
 	"gorm.io/gorm"
+	"sync"
 )
 
 // SocialServerImpl //
@@ -65,20 +66,19 @@ func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.Do
 // GetFollowList //
 // 获取关注用户列表
 func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.DouyinRelationFollowListRequest) (*pb.DouyinRelationFollowListResponse, error) {
-	// 获取中间表
-	userFollowTable := global.DB.Table(model.USER_FOLLOW_TABLE)
-
+	global.LOGGER.Info("3")
 	// 初始化响应
 	response := &pb.DouyinRelationFollowListResponse{}
 	response.StatusMsg = new(string)
 	response.StatusCode = constant.RPC_STATUS.StatusOK()
-
-	//
+	wq := sync.WaitGroup{}
+	// 初始化err
 	var err error = nil
 	// 声明userMsg
 	userMsgChan := make(chan orm.UserMsg)
 	var userFollowList []model.UserFollow
-	if result := userFollowTable.Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList); result.Error != nil {
+	if result := global.DB.Table(model.USER_FOLLOW_TABLE).Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList); result.Error != nil {
+		global.LOGGER.Info("4")
 		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,GetFollowList接口调用失败"
 		global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", result.Error)
@@ -86,12 +86,14 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 	} else if result.RowsAffected > 0 {
 		var followedUserList []*pb.User
 		// 数据库读取
+		wq.Add(1)
 		go func(list []model.UserFollow) {
+			defer wq.Done()
 			// 关闭管道
 			defer close(userMsgChan)
 			for _, user := range userFollowList {
 				var userMsg orm.UserMsg
-				err = global.DB.Where("follow_id = ?", user.FollowId).First(&userMsg).Error
+				err = global.DB.First(&userMsg, user.FollowId).Error
 				if errors.Is(err, gorm.ErrRecordNotFound) {
 					global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", err)
 				} else {
@@ -99,9 +101,10 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 				}
 			}
 		}(userFollowList)
-
+		wq.Add(1)
 		// 添加到followedUserList
-		go func() {
+		go func(res *pb.DouyinRelationFollowListResponse) {
+			defer wq.Done()
 			status := true
 			for {
 				if userMsg, ok := <-userMsgChan; ok {
@@ -120,12 +123,14 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 					})
 				} else {
 					// 管道中的数据已经取完
-					response.UserList = followedUserList
+					res.UserList = followedUserList
 					break
 				}
 			}
-		}()
+		}(response)
 	}
+
+	wq.Wait()
 	*response.StatusMsg = "GetFollowList操作成功"
 	return response, err
 }
