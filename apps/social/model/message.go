@@ -7,4 +7,13 @@ import orm "easy-tiktok/db/mysql"
 // Author lql
 type Message struct {
 	orm.Model
+	FormUserID int64
+	ToUserId   int64
+	Content    string
 }
+
+func (Message) TableName() string {
+	return MESSAGE_TABLE
+}
+
+const MESSAGE_TABLE = "message"
