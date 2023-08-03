@@ -7,7 +7,7 @@ import (
 
 func Jwt() gin.HandlerFunc {
 	return func(context *gin.Context) {
-		if context.Request.URL.Path != "/douyin/user/login/" && context.Request.URL.Path != "/douyin/user/register/" && context.Request.URL.Path != "/douyin/feed" {
+		if context.Request.URL.Path != "/douyin/user/login/" && context.Request.URL.Path != "/douyin/user/register/" && context.Request.URL.Path != "/douyin/feed/" {
 			println(context.Request.URL.Path)
 			value := context.Query("token")
 			if value == "" {

@@ -1,15 +1,19 @@
 package handle
 
 import (
+	"bytes"
 	context2 "context"
 	"easy-tiktok/apps/app/internal/rpc"
 	video "easy-tiktok/apps/video/proto"
+	"encoding/json"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"net/http"
+	"io/ioutil"
 	"strconv"
 )
 
 func videoFeedHandler(context *gin.Context) {
+
 	token := context.Query("token")
 	time := context.Query("latest_time")
 	parseInt, err := strconv.ParseInt(time, 10, 64)
@@ -28,27 +32,38 @@ func videoFeedHandler(context *gin.Context) {
 
 func videoActionHandler(context *gin.Context) {
 
-	videoFile := context.Query("data")
-
-	videoFileBytes := []byte(videoFile)
-
-	token := context.Query("token")
-	title := context.Query("title")
-
-	req := video.DouyinPublishActionRequest{
-		Token: &token,
-		Data:  videoFileBytes,
-		Title: &title,
+	//获取request以body形式传输的参数
+	type actionBodyType struct {
+		File  []byte `json:"data"`
+		Token string `json:"token"`
+		Title string `json:"title"`
 	}
-
+	var actionBody actionBodyType
+	data, err := context.GetRawData()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("data:", string(data))
+	//把字节流重新放回body
+	context.Request.Body = ioutil.NopCloser(bytes.NewBuffer(data))
+	//转成结构体类型进行参数的接收
+	if err := json.NewDecoder(context.Request.Body).Decode(&actionBody); err != nil {
+		panic(err)
+		context.JSON(400, err)
+	}
+	req := video.DouyinPublishActionRequest{
+		Token: &actionBody.Token,
+		Data:  actionBody.File,
+		Title: &actionBody.Title,
+	}
 	videoRpc := rpc.GetVideoRpc()
-	action, err := videoRpc.Action(context2.Background(), &req)
+	action, err := videoRpc.Action(context, &req)
 	if err != nil {
 		panic(err)
-		context.JSON(200, err)
+		context.JSON(400, err)
 		return
 	}
-	context.JSON(http.StatusOK, &action)
+	context.JSON(200, &action)
 }
 
 func videoListHandler(context *gin.Context) {
