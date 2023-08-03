@@ -163,7 +163,7 @@ func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.D
 			defer close(userMsgChan)
 			for _, user := range userFollowerList {
 				var userMsg orm.UserMsg
-				err = global.DB.First(&userMsg, user.FollowId).Error
+				err = global.DB.First(&userMsg, user.UserId).Error
 				if errors.Is(err, gorm.ErrRecordNotFound) {
 					global.LOGGER.Warnf("RelationServer::GetFollowerList error: %v", err)
 				} else {
@@ -208,7 +208,6 @@ func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.D
 // GetFriendList //
 // 获取登录用户好友列表
 func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.DouyinRelationFriendListRequest) (*pb.DouyinRelationFriendListResponse, error) {
-
 	return nil, nil
 }
 
