@@ -68,8 +68,6 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	select {
 	//判断请求是否被取消
 	case <-ctx.Done():
-		////请求被取消,防止因为上传文件过大,耗时过长,自动取消请求,却获取到视频cid并进行video表中的记录创建,进行回滚操作
-		//model.Rollback()
 		return nil, status.Error(codes.Canceled, "request is canceled")
 	default:
 		// 继续执行
@@ -102,7 +100,6 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	}
 
 	if err := model.Create(&videoMsg).Error; err != nil {
-		//出现问题,失败,进行事务回滚
 		model.Rollback()
 		return nil, model.Error
 	}
@@ -113,11 +110,13 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	//让发布者的作品数加一
 	user.WorkCount += 1
 	//保存修改
-	if err := model.Select("work_count").Save(&user).Error; err != nil {
-		//出现问题,失败,进行事务回滚
+	if err := model.Table("user_msg").Where("id=?", userId).Update("work_count", user.WorkCount).Error; err != nil {
 		model.Rollback()
 	}
+
+	//提交事务
 	model.Commit()
+
 	return &proto.DouyinPublishActionResponse{
 		StatusCode: &Mysql.S.Ok,
 		StatusMsg:  &Mysql.S.OkMsg,
