@@ -228,7 +228,6 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 	response.StatusMsg = new(string)
 	*response.StatusMsg = "GetFriendList操作成功"
 	response.StatusCode = constant.RPC_STATUS.StatusOK()
-
 	var err error = nil
 
 	// 通过用户id查询中间表
@@ -236,26 +235,25 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 	result := global.DB.Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList)
 	if result.Error != nil {
 		err = result.Error
+		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,GetFriendList接口调用失败"
+		global.LOGGER.Error(response.StatusMsg)
 	} else if result.RowsAffected > 0 {
 		wq := sync.WaitGroup{}
-
 		friendIdChan := make(chan int64)
-
 		wq.Add(1)
 		// 需要判断是否相互关注
 		go func() {
 			defer wq.Done()
 			for _, follow := range userFollowList {
 				var friend model.UserFollow
-				rowAffected := global.DB.Where("user_id = ? and follow_id = ? AND status = ?",
-					follow.FollowId, request.GetUserId(), constant.RELATION_FOLLOW).Limit(1).Find(&friend).RowsAffected
-				if rowAffected == 1 {
+				if rowAffected := global.DB.Where("user_id = ? and follow_id = ? AND status = ?",
+					follow.FollowId, request.GetUserId(), constant.RELATION_FOLLOW).Limit(1).Find(&friend).RowsAffected; rowAffected == 1 {
 					friendIdChan <- friend.UserId
 				}
 			}
+			close(friendIdChan)
 		}()
-
 		wq.Add(1)
 		go func(response *pb.DouyinRelationFriendListResponse) {
 			// 用户的好友列表
@@ -271,7 +269,6 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 					var messages [2]model.Message
 					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", request.GetUserId(), userId).Limit(1).Find(messages[0])
 					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", userId, request.GetUserId()).Limit(1).Find(messages[1])
-
 					var message string
 					var msgType int64
 					// 比较两条消息的最新时间
@@ -306,12 +303,10 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 					response.UserList = friendList
 					break
 				}
-
 			}
 		}(response)
 		wq.Wait()
 	}
-
 	return response, err
 }
 
@@ -339,7 +334,7 @@ func (impl *SocialServerImpl) MessageAction(ctx context.Context, request *pb.Dou
 
 		// 将消息插入数据库
 		if result := global.DB.Table(model.MESSAGE_TABLE).Create(&model.Message{
-			FormUserID: userId,
+			FromUserID: userId,
 			ToUserId:   request.GetToUserId(),
 			Content:    request.GetContent(),
 		}); result.Error != nil {
