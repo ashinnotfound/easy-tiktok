@@ -9,6 +9,7 @@ import (
 	"golang.org/x/net/context"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"gorm.io/gorm"
 )
 
 type Server struct {
@@ -73,12 +74,18 @@ func (l Server) Register(ctx context.Context, request *proto.DouyinUserRegisterR
 		Username: request.GetUsername(),
 		Password: request.GetPassword(),
 	}
-	if err := model.Create(&entry).Error; err != nil {
-		return nil, model.Error
-	}
-	msg := userMsgInit(entry.Username)
-	if err := model.Create(&msg).Error; err != nil {
-		return nil, model.Error
+	err := model.Transaction(func(tx *gorm.DB) error {
+		if err := model.Create(&entry).Error; err != nil {
+			return nil
+		}
+		msg := userMsgInit(entry.Username)
+		if err := model.Create(&msg).Error; err != nil {
+			return nil
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	token, err := util.GetToken(entry.ID)
 	if err != nil {
