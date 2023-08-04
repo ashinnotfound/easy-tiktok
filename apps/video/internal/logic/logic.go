@@ -63,6 +63,10 @@ func (s Server) Feed(ctx context.Context, request *proto.DouyinFeedRequest) (*pr
 }
 
 func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRequest) (*proto.DouyinPublishActionResponse, error) {
+
+	//数据库对象,开启事务
+	model := Mysql.GetDB().Begin()
+
 	select {
 	//判断请求是否被取消
 	case <-ctx.Done():
@@ -70,8 +74,6 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	default:
 		// 继续执行
 	}
-	//数据库对象
-	model := Mysql.GetDB()
 	//获取token
 	token := request.GetToken()
 	//视频标题
@@ -100,6 +102,7 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	}
 
 	if err := model.Create(&videoMsg).Error; err != nil {
+		model.Rollback()
 		return nil, model.Error
 	}
 
@@ -109,7 +112,12 @@ func (s Server) Action(ctx context.Context, request *proto.DouyinPublishActionRe
 	//让发布者的作品数加一
 	user.WorkCount += 1
 	//保存修改
-	model.Select("work_count").Save(&user)
+	if err := model.Table("user_msg").Where("id=?", userId).Update("work_count", user.WorkCount).Error; err != nil {
+		model.Rollback()
+	}
+
+	//提交事务
+	model.Commit()
 
 	return &proto.DouyinPublishActionResponse{
 		StatusCode: &Mysql.S.Ok,
