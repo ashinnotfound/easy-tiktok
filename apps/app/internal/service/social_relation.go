@@ -16,6 +16,12 @@ import (
 type RelationService struct {
 }
 
+type friendListResponse struct {
+	StatusCode *int32     `json:"status_code"`
+	StatusMsg  *string    `json:"status_msg"`
+	UserList   []*pb.User `json:"user_list"`
+}
+
 // Action //
 // 关注or取消关注
 func (service *RelationService) Action(c *gin.Context) {
@@ -89,15 +95,24 @@ func (service *RelationService) FriendList(c *gin.Context) {
 	token := c.Query("token")
 
 	socialClient := rpc.GetSocialRpc()
-	response, err := socialClient.GetFollowList(context.Background(),
-		&pb.DouyinRelationFollowListRequest{
+	response, err := socialClient.GetFriendList(context.Background(),
+		&pb.DouyinRelationFriendListRequest{
 			UserId: &userId,
 			Token:  &token,
 		})
+	var userList []*pb.User
+	for _, friend := range response.UserList {
+		userList = append(userList, friend.User)
+	}
+	newResponse := &friendListResponse{
+		StatusCode: response.StatusCode,
+		StatusMsg:  response.StatusMsg,
+		UserList:   userList,
+	}
 	if err != nil {
 		global.LOGGER.Errorf("RelationService::FollowList方法出错,reason: %v\n", err)
-		c.JSON(http.StatusBadRequest, response)
+		c.JSON(http.StatusBadRequest, newResponse)
 		return
 	}
-	c.JSON(http.StatusOK, response)
+	c.JSON(http.StatusOK, newResponse)
 }
