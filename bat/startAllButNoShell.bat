@@ -1,5 +1,5 @@
 @echo off
-
+cd ..
 start /B powershell go run %CD%/apps/app/start.go
 start /B powershell go run %CD%/apps/user/start.go
 start /B powershell go run %CD%/apps/video/start.go
