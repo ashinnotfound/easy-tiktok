@@ -7,7 +7,7 @@ import orm "easy-tiktok/db/mysql"
 // Author lql
 type Message struct {
 	orm.Model
-	FormUserID int64
+	FromUserID int64
 	ToUserId   int64
 	Content    string
 }
