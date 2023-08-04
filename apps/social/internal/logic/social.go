@@ -25,41 +25,59 @@ type SocialServerImpl struct {
 func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.DouyinRelationActionRequest) (*pb.DouyinRelationActionResponse, error) {
 	// 通过token获取用户id
 	userId := jwt.GetUserId(request.GetToken())
-	// 获取中间表
-	userFollowTable := global.DB.Table(model.USER_FOLLOW_TABLE)
+
 	// 查询中间表
 	var po model.UserFollow
 	// 初始化响应
 	response := &pb.DouyinRelationActionResponse{}
 	response.StatusMsg = new(string)
 	response.StatusCode = constant.RPC_STATUS.StatusOK()
+	*response.StatusMsg = "RelationAction操作成功"
 
+	var err error = nil
+	// 开启事务
+	tx := global.DB.Begin()
 	// 逻辑判断
-	if result := userFollowTable.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).Limit(1).Find(&po); result.Error != nil {
+	result := tx.Where(&model.UserFollow{UserId: userId, FollowId: request.GetToUserId()}).Limit(1).Find(&po)
+	if result.Error != nil {
 		// 查询数据库出现问题
 		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,RelationAction接口调用失败"
-		global.LOGGER.Warnf("RelationServer::Action error: %v\n", result.Error)
-		return response, result.Error
-	} else if result.RowsAffected == 0 {
+		global.LOGGER.Errorf("SocialServer::Action error: %v", result.Error)
+		err = result.Error
+	} else if result.RowsAffected == 0 && request.GetActionType() == constant.RELATION_NOT_FOLLOW {
+		response.StatusCode = constant.RPC_STATUS.StatusFailed()
+		*response.StatusMsg = "无效的输入参数,请注意前端代码"
+		global.LOGGER.Warnf("SocialServer::Action error: %v", response.StatusMsg)
+		err = errors.New(*response.StatusMsg)
+	}
+
+	if err == nil {
 		// 数据库中没有记录
-		if request.GetActionType() == constant.RELATION_FOLLOW {
+		if result.RowsAffected == 0 {
 			po = model.UserFollow{UserId: userId, FollowId: request.GetToUserId(), Status: request.GetActionType()}
-			userFollowTable.Create(&po)
-		} else if request.GetActionType() == constant.RELATION_NOT_FOLLOW {
-			response.StatusCode = constant.RPC_STATUS.StatusFailed()
-			*response.StatusMsg = "无效的输入参数,请注意前端代码"
-			global.LOGGER.Warnf("RelationServer::Action error: %v\n", response.StatusMsg)
-			return response, errors.New(*response.StatusMsg)
+			tx.Create(&po)
+		} else if po.Status != request.GetActionType() {
+			po.Status = request.GetActionType()
+			tx.Model(&po).Update("status", po.Status)
+		}
+		num := 1
+		if request.GetActionType() == constant.RELATION_NOT_FOLLOW {
+			num = -1
+		}
+		//操作user表
+		if tx.Model(&orm.UserMsg{}).Where("id = ?", po.UserId).Update("follow_count", gorm.Expr("follow_count + ?", num)).Error != nil ||
+			tx.Model(&orm.UserMsg{}).Where("id = ?", po.FollowId).Update("follower_count", gorm.Expr("follower_count + ?", num)).Error != nil {
+			err = errors.New("操作user表失败")
+			global.LOGGER.Errorf("SocialServer::Action error: %v", err)
+			tx.Rollback()
+		} else {
+			tx.Commit()
 		}
 	} else {
-		if po.Status != request.GetActionType() {
-			po.Status = request.GetActionType()
-			userFollowTable.Model(&po).Update("status", po.Status)
-		}
+		tx.Rollback()
 	}
-	*response.StatusMsg = "RelationAction操作成功"
-	return response, nil
+	return response, err
 }
 
 // GetFollowList //
@@ -78,7 +96,7 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 	if result := global.DB.Table(model.USER_FOLLOW_TABLE).Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList); result.Error != nil {
 		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,GetFollowList接口调用失败"
-		global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", result.Error)
+		global.LOGGER.Warnf("SocialServer::GetFollowList error: %v", result.Error)
 		return response, result.Error
 	} else if result.RowsAffected > 0 {
 		var followedUserList []*pb.User
@@ -92,7 +110,7 @@ func (impl *SocialServerImpl) GetFollowList(ctx context.Context, request *pb.Dou
 				var userMsg orm.UserMsg
 				err = global.DB.First(&userMsg, user.FollowId).Error
 				if errors.Is(err, gorm.ErrRecordNotFound) {
-					global.LOGGER.Warnf("RelationServer::GetFollowList error: %v", err)
+					global.LOGGER.Warnf("SocialServer::GetFollowList error: %v", err)
 				} else {
 					userMsgChan <- userMsg
 				}
@@ -148,7 +166,7 @@ func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.D
 	if result := global.DB.Table(model.USER_FOLLOW_TABLE).Where("follow_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowerList); result.Error != nil {
 		response.StatusCode = constant.RPC_STATUS.StatusFailed()
 		*response.StatusMsg = "数据库层面出现问题,GetFollowList接口调用失败"
-		global.LOGGER.Warnf("RelationServer::GetFollowerList error: %v", result.Error)
+		global.LOGGER.Warnf("SocialServer::GetFollowerList error: %v", result.Error)
 		return response, result.Error
 	} else if result.RowsAffected > 0 {
 		var followedUserList []*pb.User
@@ -162,7 +180,7 @@ func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.D
 				var userMsg orm.UserMsg
 				err = global.DB.First(&userMsg, user.UserId).Error
 				if errors.Is(err, gorm.ErrRecordNotFound) {
-					global.LOGGER.Warnf("RelationServer::GetFollowerList error: %v", err)
+					global.LOGGER.Warnf("SocialServer::GetFollowerList error: %v", err)
 				} else {
 					userMsgChan <- userMsg
 				}
