@@ -223,8 +223,96 @@ func (impl *SocialServerImpl) GetFollowerList(ctx context.Context, request *pb.D
 // GetFriendList //
 // 获取登录用户好友列表
 func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.DouyinRelationFriendListRequest) (*pb.DouyinRelationFriendListResponse, error) {
+	// 初始化响应
+	response := &pb.DouyinRelationFriendListResponse{}
+	response.StatusMsg = new(string)
+	*response.StatusMsg = "GetFriendList操作成功"
+	response.StatusCode = constant.RPC_STATUS.StatusOK()
 
-	return nil, nil
+	var err error = nil
+
+	// 通过用户id查询中间表
+	var userFollowList []model.UserFollow
+	result := global.DB.Where("user_id = ? AND status = ?", request.GetUserId(), constant.RELATION_FOLLOW).Find(&userFollowList)
+	if result.Error != nil {
+		err = result.Error
+		*response.StatusMsg = "数据库层面出现问题,GetFriendList接口调用失败"
+	} else if result.RowsAffected > 0 {
+		wq := sync.WaitGroup{}
+
+		friendIdChan := make(chan int64)
+
+		wq.Add(1)
+		// 需要判断是否相互关注
+		go func() {
+			defer wq.Done()
+			for _, follow := range userFollowList {
+				var friend model.UserFollow
+				rowAffected := global.DB.Where("user_id = ? and follow_id = ? AND status = ?",
+					follow.FollowId, request.GetUserId(), constant.RELATION_FOLLOW).Limit(1).Find(&friend).RowsAffected
+				if rowAffected == 1 {
+					friendIdChan <- friend.UserId
+				}
+			}
+		}()
+
+		wq.Add(1)
+		go func(response *pb.DouyinRelationFriendListResponse) {
+			// 用户的好友列表
+			var friendList []*pb.FriendUser
+			defer wq.Done()
+			isFollow := true
+			for {
+				var friendMsg orm.UserMsg
+				if userId, ok := <-friendIdChan; ok {
+					// 获取好友信息
+					global.DB.First(&friendMsg, userId)
+					// 获取最新的聊天记录
+					var messages [2]model.Message
+					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", request.GetUserId(), userId).Limit(1).Find(messages[0])
+					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", userId, request.GetUserId()).Limit(1).Find(messages[1])
+
+					var message string
+					var msgType int64
+					// 比较两条消息的最新时间
+					if messages[0].CreatedAt.Before(messages[1].CreatedAt) {
+						message = messages[1].Content
+						msgType = constant.MESSAGE_RECEIVE
+					} else {
+						message = messages[0].Content
+						msgType = constant.MESSAGE_SEND
+					}
+
+					friend := &pb.User{
+						Id:              &userId,
+						Name:            &friendMsg.Username,
+						FollowCount:     &friendMsg.FollowCount,
+						FollowerCount:   &friendMsg.FollowerCount,
+						IsFollow:        &isFollow,
+						Avatar:          &friendMsg.Avatar.String,
+						BackgroundImage: &friendMsg.BackgroundImage.String,
+						Signature:       &friendMsg.Signature.String,
+						TotalFavorited:  &friendMsg.TotalFavorited.Int64,
+						WorkCount:       &friendMsg.WorkCount,
+						FavoriteCount:   &friendMsg.FavoriteCount,
+					}
+
+					friendList = append(friendList, &pb.FriendUser{
+						User:    friend,
+						Message: &message,
+						MsgType: &msgType,
+					})
+				} else {
+					response.UserList = friendList
+					break
+				}
+
+			}
+		}(response)
+		wq.Wait()
+	}
+
+	return response, err
 }
 
 // Chat //
