@@ -50,17 +50,18 @@ func (service *MessageService) Chat(c *gin.Context) {
 	// 获取请求参数
 	token := c.Query("token")
 	toUserId, _ := strconv.ParseInt(c.Query("to_user_id"), 10, 64)
+	preMsgTime, _ := strconv.ParseInt(c.Query("pre_msg_time"), 10, 64)
 
 	// 获取social-RPC客户端
 	socialClient := rpc.GetSocialRpc()
-
 	// 发送请求
 	response, err := socialClient.Chat(context.Background(), &pb.DouyinMessageChatRequest{
-		Token:    &token,
-		ToUserId: &toUserId,
+		Token:      &token,
+		ToUserId:   &toUserId,
+		PreMsgTime: &preMsgTime,
 	})
 	if err != nil {
-		global.LOGGER.Errorf("MessageService::Action方法出错,reason: %v", err)
+		global.LOGGER.Errorf("MessageService::Chat方法出错,reason: %v", err)
 		c.JSON(http.StatusBadRequest, response)
 		return
 	}
