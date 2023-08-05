@@ -7,10 +7,11 @@ import (
 	"easy-tiktok/apps/social/model"
 	pb "easy-tiktok/apps/social/proto"
 	orm "easy-tiktok/db/mysql"
-	jwt "easy-tiktok/util"
+	"easy-tiktok/util"
 	"errors"
 	"gorm.io/gorm"
 	"sync"
+	"time"
 )
 
 // SocialServerImpl //
@@ -24,7 +25,7 @@ type SocialServerImpl struct {
 // 取消关注和关注用户
 func (impl *SocialServerImpl) RelationAction(ctx context.Context, request *pb.DouyinRelationActionRequest) (*pb.DouyinRelationActionResponse, error) {
 	// 通过token获取用户id
-	userId := jwt.GetUserId(request.GetToken())
+	userId := util.GetUserId(request.GetToken())
 
 	// 查询中间表
 	var po model.UserFollow
@@ -267,17 +268,32 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 					global.DB.First(&friendMsg, userId)
 					// 获取最新的聊天记录
 					var messages [2]model.Message
-					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", request.GetUserId(), userId).Limit(1).Find(messages[0])
-					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", userId, request.GetUserId()).Limit(1).Find(messages[1])
-					var message string
-					var msgType int64
-					// 比较两条消息的最新时间
-					if messages[0].CreatedAt.Before(messages[1].CreatedAt) {
-						message = messages[1].Content
-						msgType = constant.MESSAGE_RECEIVE
-					} else {
-						message = messages[0].Content
-						msgType = constant.MESSAGE_SEND
+					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", request.GetUserId(), userId).Limit(1).Find(&messages[0])
+					global.DB.Order("created_at asc").Where("from_user_id = ? AND to_user_id = ?", userId, request.GetUserId()).Limit(1).Find(&messages[1])
+					if err != nil {
+						global.LOGGER.Error(err)
+					}
+
+					friendObj := &pb.FriendUser{}
+					if &messages[0] != nil || &messages[1] != nil {
+						friendObj.Message = new(string)
+						friendObj.MsgType = new(int64)
+						if &messages[0] == nil {
+							*friendObj.Message = messages[1].Content
+							*friendObj.MsgType = constant.MESSAGE_RECEIVE
+						} else if &messages[1] == nil {
+							*friendObj.Message = messages[0].Content
+							*friendObj.MsgType = constant.MESSAGE_SEND
+						} else {
+							// 比较两条消息的最新时间
+							if messages[0].CreatedAt.Before(messages[1].CreatedAt) {
+								*friendObj.Message = messages[1].Content
+								*friendObj.MsgType = constant.MESSAGE_RECEIVE
+							} else {
+								*friendObj.Message = messages[0].Content
+								*friendObj.MsgType = constant.MESSAGE_SEND
+							}
+						}
 					}
 
 					friend := &pb.User{
@@ -293,12 +309,8 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 						WorkCount:       &friendMsg.WorkCount,
 						FavoriteCount:   &friendMsg.FavoriteCount,
 					}
-
-					friendList = append(friendList, &pb.FriendUser{
-						User:    friend,
-						Message: &message,
-						MsgType: &msgType,
-					})
+					friendObj.User = friend
+					friendList = append(friendList, friendObj)
 				} else {
 					response.UserList = friendList
 					break
@@ -314,8 +326,45 @@ func (impl *SocialServerImpl) GetFriendList(ctx context.Context, request *pb.Dou
 // 获取对话消息
 func (impl *SocialServerImpl) Chat(ctx context.Context, request *pb.DouyinMessageChatRequest) (*pb.DouyinMessageChatResponse, error) {
 	// 显示全部（limit 10）
+	friendId := request.GetToUserId()
+	userId := util.GetUserId(request.GetToken())
+	preTimestamp := time.Unix(request.GetPreMsgTime(), 0)
 
-	return nil, nil
+	// 初始化响应
+	response := &pb.DouyinMessageChatResponse{}
+	response.StatusMsg = new(string)
+	*response.StatusMsg = "Chat操作成功"
+	response.StatusCode = constant.RPC_STATUS.StatusOK()
+	var err error = nil
+
+	var message1 []*model.Message
+	var message2 []*model.Message
+	global.DB.Where("from_user_id = ? AND to_user_id = ? AND created_at > ?", userId, friendId, preTimestamp).Find(&message1)
+	global.DB.Where("from_user_id = ? AND to_user_id = ? AND created_at > ?", friendId, userId, preTimestamp).Find(&message2)
+	var messageList []*pb.Message
+
+	for _, message := range message1 {
+		timestamp := message.CreatedAt.Unix()
+		messageList = append(messageList, &pb.Message{
+			Id:         &message.ID,
+			FromUserId: &message.FromUserID,
+			ToUserId:   &message.ToUserId,
+			Content:    &message.Content,
+			CreateTime: &timestamp,
+		})
+	}
+	for _, message := range message2 {
+		timestamp := message.CreatedAt.Unix()
+		messageList = append(messageList, &pb.Message{
+			Id:         &message.ID,
+			FromUserId: &message.FromUserID,
+			ToUserId:   &message.ToUserId,
+			Content:    &message.Content,
+			CreateTime: &timestamp,
+		})
+	}
+	response.MessageList = messageList
+	return response, err
 }
 
 // MessageAction //
@@ -330,7 +379,7 @@ func (impl *SocialServerImpl) MessageAction(ctx context.Context, request *pb.Dou
 	// 判断是否为发送信息
 	if request.GetActionType() == constant.MESSAGE_SEND {
 		// 获取用户id
-		userId := jwt.GetUserId(request.GetToken())
+		userId := util.GetUserId(request.GetToken())
 
 		// 将消息插入数据库
 		if result := global.DB.Table(model.MESSAGE_TABLE).Create(&model.Message{
