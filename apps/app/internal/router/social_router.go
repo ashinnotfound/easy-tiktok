@@ -20,7 +20,7 @@ func (router *SocialRouter) InitializeRouter() {
 		global.LOGGER.Error("social router not initialize")
 	}
 	var relationService service.RelationService
-	var messageService service.MessageService
+	messageService := service.InitService()
 	relationGroup := router.RootGroup.Group("/relation")
 	{
 		relationGroup.POST("/action/", relationService.Action)
