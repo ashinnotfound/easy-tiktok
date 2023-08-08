@@ -1,11 +1,12 @@
 package rpc
 
 import (
-	"easy-tiktok/apps/app/config"
 	interaction "easy-tiktok/apps/interaction/proto"
 	social "easy-tiktok/apps/social/proto"
 	user "easy-tiktok/apps/user/proto"
 	video "easy-tiktok/apps/video/proto"
+	clientv3 "go.etcd.io/etcd/client/v3"
+	"go.etcd.io/etcd/client/v3/naming/resolver"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 )
@@ -16,21 +17,23 @@ var interactionRpc interaction.InteractionClient
 var socialRpc social.SocialClient
 
 func Initial() {
-	userDial, err := grpc.Dial(config.C.UserHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	cli, err := clientv3.NewFromURL("10.21.23.42:2379")
+	builder, err := resolver.NewBuilder(cli)
+	userDial, err := grpc.Dial("etcd:///service/user", grpc.WithResolvers(builder), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
-	videoDial, err := grpc.Dial(config.C.VideoHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	videoDial, err := grpc.Dial("etcd:///service/video", grpc.WithResolvers(builder), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 
-	interactionDial, err := grpc.Dial(config.C.InteractionHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	interactionDial, err := grpc.Dial("etcd:///service/interaction", grpc.WithResolvers(builder), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		panic(err)
 	}
 
-	socialDial, err := grpc.Dial(config.C.SocialHost, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	socialDial, err := grpc.Dial("etcd:///service/social", grpc.WithResolvers(builder), grpc.WithTransportCredentials(insecure.NewCredentials()))
 	// 初始化Rpc服务客户端
 	userRpc = user.NewUserClient(userDial)
 	videoRpc = video.NewVideoClient(videoDial)
