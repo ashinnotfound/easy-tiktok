@@ -15,6 +15,7 @@ import (
 
 func main() {
 	logger := logrus.New()
+	config.Initial()
 	ctx := context.Background()
 	listen, err := net.Listen("tcp", config.C.UserHost)
 	if err != nil {

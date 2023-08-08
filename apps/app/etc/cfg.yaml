@@ -1,7 +1,7 @@
 NetworkType: "tcp"
 Host: 0.0.0.0:8888
 Etcd: "10.21.23.42:2379"
-UserHost: localhost:8091
-VideoHost: localhost:8089
-InteractionHost: localhost:8090
-SocialHost: localhost:8092
+UserHost: "localhost:8091"
+VideoHost: "localhost:8089"
+InteractionHost: "localhost:8090"
+SocialHost: "localhost:8092"
