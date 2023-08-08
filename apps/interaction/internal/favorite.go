@@ -33,20 +33,30 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 	}
 	userId := util.GetUserId(request.GetToken())
 
-	// 开始事务
-	tx := Mysql.GetDB().Begin()
+	db := Mysql.GetDB()
 	// 查找当前用户
 	var userMsg Mysql.UserMsg
-	tx.First(&userMsg, userId)
-	// 查找视频
+	if err := db.First(&userMsg, userId).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.InvalidArgument, "Favorite::invalid token")
+		} else {
+			return nil, status.Error(codes.Aborted, "Favorite::database exception")
+		}
+	}
+	// 查找视频和视频发布者
 	var video Mysql.Video
-	tx.First(&video, request.GetVideoId())
-	// 查找视频发布者
-	var authorMsg Mysql.UserMsg
-	tx.First(&authorMsg, video.UserMsgID)
+	if err := db.Preload("UserMsg").First(&video, request.GetVideoId()).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, status.Error(codes.InvalidArgument, "Favorite::invalid videoId")
+		} else {
+			return nil, status.Error(codes.Aborted, "Favorite::database exception")
+		}
+	}
 
 	// 查找视频点赞记录 判断点赞/取消点赞
 	var like Mysql.Like
+	// 开始事务
+	tx := db.Begin()
 	if err := tx.Where("video_id = ? AND liker_id = ?", request.GetVideoId(), userId).First(&like).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 进行点赞操作
@@ -88,7 +98,7 @@ func (Server) Favorite(ctx context.Context, request *proto.DouyinFavoriteActionR
 		// 视频的点赞总数+-1
 		if tx.Model(&video).Update("favorite_count", video.FavoriteCount+numToAdd).Error == nil {
 			// 视频发布者获得赞数+-1
-			if tx.Model(&authorMsg).Update("total_favorited", authorMsg.TotalFavorited.Int64+numToAdd).Error == nil {
+			if tx.Model(&video.UserMsg).Update("total_favorited", video.UserMsg.TotalFavorited.Int64+numToAdd).Error == nil {
 				// 提交事务
 				tx.Commit()
 				return &proto.DouyinFavoriteActionResponse{
