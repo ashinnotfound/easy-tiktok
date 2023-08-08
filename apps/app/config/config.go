@@ -9,12 +9,17 @@ import (
 var C config
 
 type config struct {
-	NetworkType     string `yaml:"NetworkType"`
-	Host            string `yaml:"Host"`
-	UserHost        string `yaml:"UserHost"`
-	VideoHost       string `yaml:"VideoHost"`
-	InteractionHost string `yaml:"InteractionHost"`
-	SocialHost      string `yaml:"SocialHost"`
+	NetworkType        string `yaml:"NetworkType"`
+	Host               string `yaml:"Host"`
+	Etcd               string `yaml:"Etcd"`
+	UserHost           string `yaml:"UserHost"`
+	UserService        string `yaml:"UserService"`
+	VideoHost          string `yaml:"VideoHost"`
+	VideoService       string `yaml:"VideoService"`
+	InteractionHost    string `yaml:"InteractionHost"`
+	InteractionService string `yaml:"InteractionService"`
+	SocialHost         string `yaml:"SocialHost"`
+	SocialService      string `yaml:"SocialService"`
 }
 
 func Initial() {
