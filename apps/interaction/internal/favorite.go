@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 	"gorm.io/gorm"
+	"sync"
 )
 
 type Server struct {
@@ -139,56 +140,73 @@ func (Server) GetFavoriteList(ctx context.Context, request *proto.DouyinFavorite
 	if err := db.Where("liker_id = ?", userId).Find(&like).Error; err != nil {
 		return nil, status.Error(codes.Aborted, "GetFavoriteList::database exception")
 	}
-	// 查找数据库的视频列表
-	var video []Mysql.Video
-	for _, v := range like {
-		var currentVideo Mysql.Video
-		if err := db.First(&currentVideo, v.VideoID).Error; err != nil {
-			// TODO 后续对查找失败的视频做进一步处理
-			continue
+
+	signal := sync.WaitGroup{}
+	videoChan := make(chan Mysql.Video)
+
+	signal.Add(1)
+	go func() {
+		defer signal.Done()
+		defer close(videoChan)
+		// 查找数据库的视频列表
+		for _, v := range like {
+			var currentVideo Mysql.Video
+			if err := db.First(&currentVideo, v.VideoID).Error; err != nil {
+				// TODO 后续对查找失败的视频做进一步处理
+				continue
+			}
+			videoChan <- currentVideo
 		}
-		video = append(video, currentVideo)
-	}
-	// 填充返回值视频列表
+	}()
+
 	var videoList []*proto.Video
-	isFavorite := true
-	for i := range video {
-		v := video[i]
-		var follow model.UserFollow
-		isFollow := true
-		if err := db.Where("follow_id = ? AND user_id = ? AND status = ?", v.UserMsgID, userId, constant.RELATION_FOLLOW).First(&follow).Error; err != nil {
-			// 找不到记录说明没关注
-			if errors.Is(err, gorm.ErrRecordNotFound) {
-				isFollow = false
+	signal.Add(1)
+	go func() {
+		defer signal.Done()
+		// 填充返回值视频列表
+		for {
+			if video, isOk := <-videoChan; isOk {
+				var follow model.UserFollow
+				isFollow := true
+				if err := db.Where("follow_id = ? AND user_id = ? AND status = ?", video.UserMsgID, userId, constant.RELATION_FOLLOW).First(&follow).Error; err != nil {
+					// 找不到记录说明没关注
+					if errors.Is(err, gorm.ErrRecordNotFound) {
+						isFollow = false
+					} else {
+						// TODO 后续对查找数据库异常的视频做进一步处理
+						continue
+					}
+				}
+				isFavorite := true
+				videoList = append(videoList, &proto.Video{
+					Id: &video.ID,
+					Author: &proto.User{
+						Id:              &video.UserMsg.ID,
+						Name:            &video.UserMsg.Username,
+						FollowCount:     &video.UserMsg.FollowCount,
+						FollowerCount:   &video.UserMsg.FollowerCount,
+						IsFollow:        &isFollow,
+						Avatar:          &video.UserMsg.Avatar.String,
+						BackgroundImage: &video.UserMsg.BackgroundImage.String,
+						Signature:       &video.UserMsg.Signature.String,
+						TotalFavorited:  &video.UserMsg.TotalFavorited.Int64,
+						WorkCount:       &video.UserMsg.WorkCount,
+						FavoriteCount:   &video.UserMsg.FavoriteCount,
+					},
+					PlayUrl:       &video.PlayUrl,
+					CoverUrl:      &video.CoverUrl,
+					FavoriteCount: &video.FavoriteCount,
+					CommentCount:  &video.CommentCount,
+					IsFavorite:    &isFavorite,
+					Title:         &video.Title,
+				})
 			} else {
-				return nil, status.Error(codes.Aborted, "GetFavoriteList::database exception")
+				break
 			}
 		}
+	}()
 
-		videoList = append(videoList, &proto.Video{
-			Id: &v.ID,
-			Author: &proto.User{
-				Id:              &v.UserMsg.ID,
-				Name:            &v.UserMsg.Username,
-				FollowCount:     &v.UserMsg.FollowCount,
-				FollowerCount:   &v.UserMsg.FollowerCount,
-				IsFollow:        &isFollow,
-				Avatar:          &v.UserMsg.Avatar.String,
-				BackgroundImage: &v.UserMsg.BackgroundImage.String,
-				Signature:       &v.UserMsg.Signature.String,
-				TotalFavorited:  &v.UserMsg.TotalFavorited.Int64,
-				WorkCount:       &v.UserMsg.WorkCount,
-				FavoriteCount:   &v.UserMsg.FavoriteCount,
-			},
-			PlayUrl:       &v.PlayUrl,
-			CoverUrl:      &v.CoverUrl,
-			FavoriteCount: &v.FavoriteCount,
-			CommentCount:  &v.CommentCount,
-			IsFavorite:    &isFavorite,
-			Title:         &v.Title,
-		})
-	}
-
+	signal.Wait()
 	statusMsg := "获取用户喜欢视频列表成功"
 	return &proto.DouyinFavoriteListResponse{
 		StatusCode: &Mysql.S.Ok,
